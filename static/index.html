@@ -248,7 +248,7 @@
       }, { once: true });
     })();
   </script>
-  <link rel="stylesheet" href="/static/style.css?v=20260723tasksbulkfeedback1">
+  <link rel="stylesheet" href="/static/style.css?v=20260802emailtoggle1">
   <link rel="modulepreload" href="/static/app.js?v=20260723tasksbulkfeedback1">
   <link rel="modulepreload" href="/static/js/chat.js?v=20260722ctxheader4">
   <link rel="modulepreload" href="/static/js/ui.js">
@@ -1898,6 +1898,11 @@
                 <span class="vis-label">Sensitive Blur <span class="vis-hint">Blur emails, tokens, and secrets in AI output</span></span>
                 <input type="checkbox" data-privacy-key="sensitive-blur"><span class="vis-switch"></span>
               </label>
+              <label class="vis-row">
+                <span class="vis-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></span>
+                <span class="vis-label">Auto-load Email Images <span class="vis-hint">Load remote &amp; inline images automatically; off = click to load</span></span>
+                <input type="checkbox" checked data-privacy-key="email-images-auto"><span class="vis-switch"></span>
+              </label>
             </div>
           </div>
           <div class="admin-card" style="padding-bottom:6px;">
@@ -2528,7 +2533,7 @@
 <script type="module" src="/static/js/search-chat.js"></script>
 <script type="module" src="/static/js/theme.js"></script>
 <script type="module" src="/static/js/censor.js"></script>
-<script type="module" src="/static/js/settings.js?v=20260723compareicon1"></script>
+<script type="module" src="/static/js/settings.js?v=20260802emailtoggle1"></script>
 <script type="module" src="/static/js/assistant.js"></script>
 <script type="module" src="/static/app.js?v=20260723tasksbulkfeedback1"></script>  <!-- app.js must be LAST -->
   <script type="module" src="/static/js/init.js?v=20260715freshroot3"></script>

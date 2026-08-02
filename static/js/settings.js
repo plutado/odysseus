@@ -1776,11 +1776,21 @@ function initAppearance() {
 
   modalEl.querySelectorAll('[data-privacy-key]').forEach(function(chk) {
     chk.addEventListener('change', function() {
-      if (chk.dataset.privacyKey !== 'sensitive-blur') return;
-      localStorage.setItem('odysseus-sensitive-blur', chk.checked ? 'on' : 'off');
-      window.dispatchEvent(new CustomEvent('odysseus-sensitive-blur-change', {
-        detail: { enabled: chk.checked }
-      }));
+      if (chk.dataset.privacyKey === 'sensitive-blur') {
+        localStorage.setItem('odysseus-sensitive-blur', chk.checked ? 'on' : 'off');
+        window.dispatchEvent(new CustomEvent('odysseus-sensitive-blur-change', {
+          detail: { enabled: chk.checked }
+        }));
+        return;
+      }
+      // Fork customization: "Auto-load Email Images" (checked = auto, the
+      // default). emailLibrary.js reads odysseusEmailImagesManual — '1' means
+      // manual/click-to-load. Unchecking here opts into the privacy flow.
+      if (chk.dataset.privacyKey === 'email-images-auto') {
+        if (chk.checked) localStorage.removeItem('odysseusEmailImagesManual');
+        else localStorage.setItem('odysseusEmailImagesManual', '1');
+        return;
+      }
     });
   });
 
@@ -1817,6 +1827,11 @@ function syncAppearanceCheckboxes() {
 function syncPrivacyCheckboxes() {
   modalEl.querySelectorAll('[data-privacy-key="sensitive-blur"]').forEach(function(chk) {
     chk.checked = localStorage.getItem('odysseus-sensitive-blur') === 'on';
+  });
+  // Auto-load Email Images defaults ON (checked) — only unchecked when the user
+  // has explicitly opted into manual/click-to-load mode.
+  modalEl.querySelectorAll('[data-privacy-key="email-images-auto"]').forEach(function(chk) {
+    chk.checked = localStorage.getItem('odysseusEmailImagesManual') !== '1';
   });
 }
 
