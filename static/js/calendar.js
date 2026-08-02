@@ -2806,9 +2806,18 @@ function _showEventForm(existing, defaultDate, defaultEndDate) {
   // Default to all-day when dragging across multiple days
   const ad = existing ? existing.all_day : (defaultEndDate && defaultEndDate !== defaultDate);
 
-  let calOpts = _calendars.filter(c => !_hiddenCals.has(c.href)).map(c =>
-    `<option value="${_e(c.href)}" ${existing && existing.calendar_href === c.href ? 'selected' : ''}>${_e(c.name)}</option>`
-  ).join('');
+  // Fork customization: when creating a NEW event (not editing), default the
+  // calendar to a CalDAV-backed one (e.g. ht.live) so the event syncs out to
+  // the remote — only source=="caldav" events are pushed to Google. Editing
+  // keeps the event's own calendar selected.
+  const _defaultNewCalHref = (
+    _calendars.find(c => c.source === 'caldav' && !_hiddenCals.has(c.href)) ||
+    _calendars.find(c => !_hiddenCals.has(c.href)) || {}
+  ).href;
+  let calOpts = _calendars.filter(c => !_hiddenCals.has(c.href)).map(c => {
+    const sel = existing ? (existing.calendar_href === c.href) : (c.href === _defaultNewCalHref);
+    return `<option value="${_e(c.href)}" ${sel ? 'selected' : ''}>${_e(c.name)}</option>`;
+  }).join('');
 
   // "Bespoke" event form: a big clock-face hero (time + date) and a single
   // title input. Everything else (location, description, recurrence,
@@ -3181,7 +3190,8 @@ function _showEventForm(existing, defaultDate, defaultEndDate) {
       description: document.getElementById('cal-f-desc').value,
       location: document.getElementById('cal-f-loc').value,
       rrule: document.getElementById('cal-f-rrule').value || '',
-      calendar_href: document.getElementById('cal-f-cal')?.value || (_calendars[0]?.href || ''),
+      calendar_href: document.getElementById('cal-f-cal')?.value
+        || (_calendars.find(c => c.source === 'caldav') || _calendars[0] || {}).href || '',
       color: colorVal || undefined,
     };
     try {
