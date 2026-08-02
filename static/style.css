@@ -31167,10 +31167,15 @@ button .spinner-whirlpool {
   min-height: 0;
   background: var(--panel);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--border) 65%, transparent);
-  /* Use the OS colored emoji font for incoming mail content */
+  /* Use the OS colored emoji font for incoming mail content. NOTE: do NOT force
+     font-variant-emoji:emoji here — that forces emoji presentation for every
+     Emoji-property character, which includes plain DIGITS 0-9, ©, #, * (keycap
+     bases). That made every number in an email render as a tiny, baseline-
+     shifted keycap-style glyph. `normal` lets real emoji colorize (they default
+     to emoji presentation) while digits/©/# stay as normal text. */
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif,
                "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla";
-  font-variant-emoji: emoji;
+  font-variant-emoji: normal;
 }
 /* When rendering HTML emails, override pre-wrap so layout works */
 .email-reader-body.html-body {
@@ -32044,7 +32049,9 @@ button .spinner-whirlpool {
 #doc-editor-code.email-mode .doc-editor-textarea {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif,
                "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla" !important;
-  font-variant-emoji: emoji;
+  /* normal, not emoji: forcing emoji presentation turns digits/©/# into tiny
+     keycap glyphs (see .email-reader-body note). Real emoji still colorize. */
+  font-variant-emoji: normal;
 }
 
 /* Single-layer rendering for ALL documents (not just email): the highlight
@@ -41148,15 +41155,3 @@ body.theme-frosted .modal {
    To restore the click-to-load privacy flow WITH per-image download buttons,
    set localStorage odysseusEmailImagesManual='1' AND remove this rule. */
 .email-inline-image-download-btn { display: none !important; }
-
-/* Fork customization: neutralize the subscript figure feature some senders set
-   on a wrapper element (font-feature-settings:"subs" or the font-variant /
-   font-variant-position:sub longhand). It only has glyphs for DIGITS, so every
-   number in the email renders as a tiny dropped subscript. The sanitizer strips
-   the inline declarations; this backstops the font-variant shorthand vector and
-   any stale-JS case. */
-.email-reader-body, .email-reader-body *,
-.email-bubble-body, .email-bubble-body * {
-  font-variant-position: normal !important;
-  font-feature-settings: normal !important;
-}
