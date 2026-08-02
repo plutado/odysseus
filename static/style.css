@@ -41139,3 +41139,12 @@ body.theme-frosted .modal {
 .sidebar .section-title-label {
   font-size: 14px !important;
 }
+
+/* Fork customization: auto-load email inline images by default. The per-image
+   download button on a blocked/hidden placeholder reads as clutter (esp. on
+   images inside collapsed quoted replies that never auto-load). The JS no longer
+   emits it in auto-load mode; this is a belt-and-suspenders CSS backstop so the
+   icon is gone even if a browser is holding a stale copy of emailLibrary.js.
+   To restore the click-to-load privacy flow WITH per-image download buttons,
+   set localStorage odysseusEmailImagesManual='1' AND remove this rule. */
+.email-inline-image-download-btn { display: none !important; }

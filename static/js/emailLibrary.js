@@ -5588,11 +5588,22 @@ function _prepareEmailInlineImages(html) {
   const doc = new DOMParser().parseFromString(`<div>${raw}</div>`, 'text/html');
   const root = doc.body.firstElementChild;
   if (!root) return raw;
+  // Fork customization: in auto-load mode (the default), images load themselves,
+  // so the per-image download button is just clutter — and it strands a download
+  // icon on any placeholder that never auto-loads (e.g. images inside a collapsed
+  // quoted reply, which are display:none at wire time). Only emit the download
+  // button in privacy/manual mode (odysseusEmailImagesManual === '1').
+  let _emailImagesManual = false;
+  try { _emailImagesManual = localStorage.getItem('odysseusEmailImagesManual') === '1'; } catch (e) {}
   root.querySelectorAll('img').forEach((img, idx) => {
     const src = (img.getAttribute('src') || '').trim();
     const alt = (img.getAttribute('alt') || img.getAttribute('title') || '').trim();
     const isHttp = /^https?:\/\//i.test(src);
     const isCid = /^cid:/i.test(src);
+    // Only remote (http) and embedded (cid) images need blocking/proxying.
+    // Leave data:/blob:/inline images as-is so they render directly — the
+    // placeholder can't reload them, which strands a download icon.
+    if (!isHttp && !isCid) return;
     const cid = isCid ? src.replace(/^cid:/i, '').replace(/^<|>$/g, '').trim() : '';
     const label = alt || (isCid ? 'Inline image' : 'Remote image');
     const ph = doc.createElement('span');
@@ -5612,8 +5623,8 @@ function _prepareEmailInlineImages(html) {
         <span class="email-inline-image-sub">${isHttp ? 'Remote image blocked' : isCid ? 'Inline image hidden' : 'Image unavailable'}</span>
       </span>
       <span class="email-inline-image-actions">
-        ${isHttp ? `<a class="email-inline-image-btn email-inline-image-download-btn" href="${_esc(src)}" target="_blank" rel="noopener noreferrer" download title="Download" aria-label="Download"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a>` : ''}
-        ${isCid ? `<button type="button" class="email-inline-image-btn email-inline-image-download-btn" data-email-img-download="${idx}" title="Download" aria-label="Download"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>` : ''}
+        ${(_emailImagesManual && isHttp) ? `<a class="email-inline-image-btn email-inline-image-download-btn" href="${_esc(src)}" target="_blank" rel="noopener noreferrer" download title="Download" aria-label="Download"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a>` : ''}
+        ${(_emailImagesManual && isCid) ? `<button type="button" class="email-inline-image-btn email-inline-image-download-btn" data-email-img-download="${idx}" title="Download" aria-label="Download"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>` : ''}
       </span>
     `;
     img.replaceWith(ph);
@@ -5623,6 +5634,11 @@ function _prepareEmailInlineImages(html) {
 
 function _wireEmailInlineImages(reader) {
   if (!reader) return;
+  // Fork customization: auto-load email images by default. Restore the
+  // privacy-preserving click-to-"Load all" behavior with:
+  //   localStorage.setItem('odysseusEmailImagesManual', '1')
+  let _emailImagesManual = false;
+  try { _emailImagesManual = localStorage.getItem('odysseusEmailImagesManual') === '1'; } catch (e) {}
   const placeholders = Array.from(reader.querySelectorAll('.email-inline-image-placeholder'));
   const visiblePlaceholders = placeholders.filter(ph => (
     ph.isConnected &&
@@ -5650,7 +5666,13 @@ function _wireEmailInlineImages(reader) {
     const isRemoteImage = /^https?:\/\//i.test(src);
     const isCidImage = !!cid && !isRemoteImage;
     const loadSrc = isRemoteImage ? src : inlineUrl();
-    if (!loadSrc || ph.classList.contains('is-loading')) return;
+    if (ph.classList.contains('is-loading')) return;
+    if (!loadSrc) {
+      // Nothing loadable (e.g. a cid image with no resolvable uid). In auto-load
+      // mode, drop the stray placeholder + download icon rather than leaving it.
+      if (!_emailImagesManual && ph.isConnected) ph.remove();
+      return;
+    }
     ph.classList.remove('is-error');
     ph.classList.add('is-loading');
     const sub = ph.querySelector('.email-inline-image-sub');
@@ -5683,6 +5705,15 @@ function _wireEmailInlineImages(reader) {
     const showError = (err) => {
       if (settled) return;
       settled = true;
+      if (!_emailImagesManual) {
+        // Auto-load mode: a failed image is almost always a spacer or tracking
+        // pixel — remove it entirely instead of leaving a "blocked" placeholder
+        // with a download icon (which reads as clutter).
+        if (frame?.isConnected) frame.remove();
+        if (ph?.isConnected) ph.remove();
+        if (objectUrl) { try { URL.revokeObjectURL(objectUrl); } catch {} }
+        return;
+      }
       if (frame?.isConnected) frame.replaceWith(ph);
       ph.classList.remove('is-loading');
       ph.classList.add('is-error');
@@ -5748,7 +5779,8 @@ function _wireEmailInlineImages(reader) {
       }
     }, 12000);
   };
-  if (visiblePlaceholders.length && !reader.querySelector('.email-inline-image-load-all')) {
+  if (!_emailImagesManual) visiblePlaceholders.forEach(loadPlaceholder);
+  if (_emailImagesManual && visiblePlaceholders.length && !reader.querySelector('.email-inline-image-load-all')) {
     const first = visiblePlaceholders[0];
     const bar = document.createElement('div');
     bar.className = 'email-inline-image-load-all';
