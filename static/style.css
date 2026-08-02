@@ -41130,3 +41130,12 @@ body.theme-frosted .modal {
   .compare-grid[data-cols] { grid-template-columns: 1fr !important; overflow-y: auto; }
   .compare-pane { min-height: 60dvh; }
 }
+
+/* Left-sidebar navigation items + section headers — explicit desktop size for
+   readability. (These otherwise inherit the small root size.) */
+.sidebar .list-item,
+.sidebar .list-item .grow,
+.sidebar .section-title,
+.sidebar .section-title-label {
+  font-size: 14px !important;
+}

@@ -6,6 +6,9 @@ services:
     volumes:
       - ${APP_DATA_DIR:-./data}:/app/data:z
       - ${APP_LOGS_DIR:-./logs}:/app/logs:z
+      # Dev override: serve the host static/ so frontend edits (e.g. the voice
+      # recording indicator) take effect on browser reload without a rebuild.
+      - ./static:/app/static:ro,z
       # Cookbook remote-server SSH identity. Odysseus can generate a key here;
       # add the shown public key to each remote server's authorized_keys.
       - ${APP_DATA_DIR:-./data}/ssh:/app/.ssh:z
