@@ -41148,3 +41148,15 @@ body.theme-frosted .modal {
    To restore the click-to-load privacy flow WITH per-image download buttons,
    set localStorage odysseusEmailImagesManual='1' AND remove this rule. */
 .email-inline-image-download-btn { display: none !important; }
+
+/* Fork customization: neutralize the subscript figure feature some senders set
+   on a wrapper element (font-feature-settings:"subs" or the font-variant /
+   font-variant-position:sub longhand). It only has glyphs for DIGITS, so every
+   number in the email renders as a tiny dropped subscript. The sanitizer strips
+   the inline declarations; this backstops the font-variant shorthand vector and
+   any stale-JS case. */
+.email-reader-body, .email-reader-body *,
+.email-bubble-body, .email-bubble-body * {
+  font-variant-position: normal !important;
+  font-feature-settings: normal !important;
+}

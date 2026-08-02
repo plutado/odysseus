@@ -166,7 +166,13 @@ function _sanitizeHtmlOnce(html) {
 
   const STRIP_CSS_PROPS = ['color', 'background', 'background-color',
                            'font-family', 'font', '-webkit-text-fill-color',
-                           'position', 'z-index'];
+                           'position', 'z-index',
+                           // Fork: some senders set a subscript figure feature on
+                           // a wrapper (font-feature-settings:"subs" or
+                           // font-variant-position:sub). Fonts only have subscript
+                           // glyphs for DIGITS, so every number in the email
+                           // renders as a tiny dropped subscript. Strip them.
+                           'font-feature-settings', 'font-variant-position'];
   const HIGHLIGHT_INLINE_TAGS = new Set(['SPAN', 'FONT', 'EM', 'B', 'I',
                                          'STRONG', 'SMALL', 'U']);
   const HAS_BG_COLOR = /background(?:-color)?\s*:\s*(?!\s*(?:transparent|none|inherit|initial)\b)[^;]+/i;
