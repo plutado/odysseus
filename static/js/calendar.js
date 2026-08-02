@@ -2806,15 +2806,21 @@ function _showEventForm(existing, defaultDate, defaultEndDate) {
   // Default to all-day when dragging across multiple days
   const ad = existing ? existing.all_day : (defaultEndDate && defaultEndDate !== defaultDate);
 
-  // Fork customization: when creating a NEW event (not editing), default the
-  // calendar to a CalDAV-backed one (e.g. ht.live) so the event syncs out to
-  // the remote — only source=="caldav" events are pushed to Google. Editing
-  // keeps the event's own calendar selected.
+  // Fork customization: default the calendar for NEW events to the one the user
+  // last saved an event in (persisted in localStorage on every save), so the
+  // choice "sticks" — e.g. after moving entries into "Personal" once, new events
+  // keep landing there. Falls back to a CalDAV calendar (only source=="caldav"
+  // events sync out to the remote) then any calendar. Editing keeps the event's
+  // own calendar selected.
+  const _visibleCals = _calendars.filter(c => !_hiddenCals.has(c.href));
+  let _rememberedCalHref = '';
+  try { _rememberedCalHref = localStorage.getItem('odysseusDefaultCalendarHref') || ''; } catch (e) {}
   const _defaultNewCalHref = (
-    _calendars.find(c => c.source === 'caldav' && !_hiddenCals.has(c.href)) ||
-    _calendars.find(c => !_hiddenCals.has(c.href)) || {}
+    (_rememberedCalHref && _visibleCals.find(c => c.href === _rememberedCalHref)) ||
+    _visibleCals.find(c => c.source === 'caldav') ||
+    _visibleCals[0] || {}
   ).href;
-  let calOpts = _calendars.filter(c => !_hiddenCals.has(c.href)).map(c => {
+  let calOpts = _visibleCals.map(c => {
     const sel = existing ? (existing.calendar_href === c.href) : (c.href === _defaultNewCalHref);
     return `<option value="${_e(c.href)}" ${sel ? 'selected' : ''}>${_e(c.name)}</option>`;
   }).join('');
@@ -3197,6 +3203,11 @@ function _showEventForm(existing, defaultDate, defaultEndDate) {
     try {
       if (isEdit) await _updateEvent(existing.uid, payload);
       else await _createEvent(payload);
+      // Fork customization: remember the calendar just used so the next new
+      // event defaults to it (see _defaultNewCalHref above).
+      try {
+        if (payload.calendar_href) localStorage.setItem('odysseusDefaultCalendarHref', payload.calendar_href);
+      } catch (e) {}
       // Create reminder if selected
       const remindVal = document.getElementById('cal-f-remind')?.value;
       if (remindVal) {
