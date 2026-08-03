@@ -27,7 +27,7 @@
 
 ## Fork customizations
 
-`plutado/odysseus`, branch **`local-customizations`**. These are quality-of-life tweaks layered on upstream Odysseus. They're **frontend + config only** (JavaScript / CSS / HTML + `docker-compose.yml`) — no backend or database changes — so they apply cleanly on top of the stock image.
+`plutado/odysseus`, branch **`local-customizations`**. These are quality-of-life tweaks layered on upstream Odysseus. Most are **frontend + config** (JavaScript / CSS / HTML + `docker-compose.yml`) and serve live via the static bind-mount; there is also **one small backend fix** (see [Models & endpoints](#models--endpoints)) which requires a one-time image rebuild (`docker compose up -d --build`).
 
 ### Run this fork
 
@@ -62,9 +62,15 @@ Everything in the upstream [Quick Start](#quick-start) and [setup guide](docs/se
 - **Larger sidebar navigation.** Sidebar nav items and section headers are set to 14px for readability (they otherwise inherit a smaller root size).
   - Files: `static/style.css`.
 
+### Models & endpoints
+
+- **Local (host-gateway) endpoints are detected as local.** `host.docker.internal` and `gateway.docker.internal` — the Docker Desktop aliases a container uses to reach services on the *host* (the standard "Odysseus in Docker + native Ollama / models on the host" setup) — are now classified as **local** endpoints. Previously they were treated as remote `"api"` endpoints, which puts the model picker into pinning/allow-list mode, so locally-served models don't show up for selection unless explicitly pinned. With this fix, host-served local models appear automatically.
+  - Files: `routes/model_routes.py` (`_LOCAL_HOSTS`); test in `tests/test_model_routes.py` (`TestClassifyEndpoint.test_docker_host_gateway_is_local`).
+  - ⚠️ **Backend change** — this is baked into the image, so apply it with `docker compose up -d --build` (a rebuild), not just a page reload.
+
 ### Developer notes (for extending this fork)
 
-- **Live frontend edits:** `docker-compose.yml` bind-mounts `./static:/app/static:ro`, so frontend changes serve on reload — no image rebuild.
+- **Live frontend edits:** `docker-compose.yml` bind-mounts `./static:/app/static:ro`, so frontend changes serve on reload — no image rebuild. **Backend changes** (anything under `routes/`, etc.) are baked into the image and need `docker compose up -d --build` to take effect.
 - **Cache-busting (important):** frontend modules are imported with a static `?v=` query and precached by the service worker. When you change a versioned file, **bump its `?v=` everywhere it's referenced *and* bump `CACHE_NAME` in `static/sw.js`**, or browsers serve the stale module. The served files are always fresh (the static dir is `no-cache` + bind-mounted); the staleness is purely the browser's module/HTTP cache keyed on the unchanged URL.
 - Machine-specific setup notes (paths, secrets, model choices) are kept out of Git via `.gitignore`.
 
