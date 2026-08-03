@@ -758,8 +758,15 @@ def _probe_single_model(base: str, api_key: str, model_id: str, timeout: int = 1
         return {"status": "fail", "error": str(e)[:80]}
 
 
-# Hostnames / IP prefixes that indicate a local endpoint
-_LOCAL_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
+# Hostnames / IP prefixes that indicate a local endpoint. Includes the Docker
+# Desktop host-gateway aliases so a containerized app reaching a service on the
+# host (the standard "Odysseus in Docker + native Ollama/models on the host"
+# setup) is classified local — not as a remote "api" endpoint whose picker
+# requires pinning/allow-listing.
+_LOCAL_HOSTS = {
+    "localhost", "127.0.0.1", "0.0.0.0", "::1",
+    "host.docker.internal", "gateway.docker.internal",
+}
 _PRIVATE_NETWORKS = (
     ipaddress.ip_network("10.0.0.0/8"),
     ipaddress.ip_network("172.16.0.0/12"),

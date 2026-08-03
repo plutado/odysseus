@@ -422,6 +422,14 @@ class TestClassifyEndpoint:
     def test_127(self):
         assert _classify_endpoint("http://127.0.0.1:8080/v1") == "local"
 
+    def test_docker_host_gateway_is_local(self):
+        # Docker Desktop host-gateway aliases: a containerized app reaching a
+        # service on the host (the standard "Odysseus in Docker + native models
+        # on the host" setup) must classify as local under the default auto
+        # kind — not as a remote "api" endpoint whose picker requires pinning.
+        assert _classify_endpoint("http://host.docker.internal:11434/v1") == "local"
+        assert _classify_endpoint("http://gateway.docker.internal:8710/v1") == "local"
+
     def test_private_192(self):
         assert _classify_endpoint("http://192.168.1.100:5000") == "local"
 
