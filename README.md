@@ -23,6 +23,51 @@
 
 ---
 
+> ⚙️ **This is a customized fork of [odysseus-dev/odysseus](https://github.com/odysseus-dev/odysseus).** The changes this fork adds — and how to use them — are documented under **[Fork customizations](#fork-customizations)**. The stock upstream README (Quick Start, Features, etc.) follows below and still applies.
+
+## Fork customizations
+
+`plutado/odysseus`, branch **`local-customizations`**. These are quality-of-life tweaks layered on upstream Odysseus. They're **frontend + config only** (JavaScript / CSS / HTML + `docker-compose.yml`) — no backend or database changes — so they apply cleanly on top of the stock image.
+
+### Run this fork
+
+```bash
+git clone -b local-customizations https://github.com/plutado/odysseus.git
+cd odysseus
+cp .env.example .env
+docker compose up -d --build
+```
+
+Everything in the upstream [Quick Start](#quick-start) and [setup guide](docs/setup.md) still applies.
+
+### Email
+
+- **Inline images auto-load.** Remote and embedded (`cid:`) images render automatically instead of the click-to-"Load all" flow; failed spacer/tracking images are dropped rather than left as "blocked" placeholders, and the per-image download-icon clutter is removed.
+  - **Toggle:** *Settings → Privacy → "Auto-load Email Images"* (on by default; off restores the upstream click-to-load privacy flow). Persisted in `localStorage.odysseusEmailImagesManual`.
+  - Files: `static/js/emailLibrary.js`, `static/index.html`, `static/js/settings.js`, `static/style.css`.
+- **Numbers render correctly.** Email bodies no longer force `font-variant-emoji: emoji`, which had turned every digit / `©` / `#` into a tiny keycap-style emoji glyph while leaving letters normal. Real emoji still colorize.
+  - Files: `static/style.css` (`.email-reader-body`, `.email-mode` compose editor).
+
+### Calendar
+
+- **New events default to a sync-out calendar.** The new-event form defaults its calendar to a CalDAV-backed one (so events push to the remote, e.g. Google) instead of a local-only calendar, and **remembers the last calendar you used** (`localStorage.odysseusDefaultCalendarHref`). Editing an event keeps its own calendar.
+  - Files: `static/js/calendar.js`.
+
+### Interface
+
+- **Voice recording indicator.** While dictating: a pulsing dot, elapsed `MM:SS` timer, a live audio-level meter, and an explicit **Stop** button.
+  - Files: `static/js/voiceRecorder.js`, `static/style.css`.
+- **Larger sidebar navigation.** Sidebar nav items and section headers are set to 14px for readability (they otherwise inherit a smaller root size).
+  - Files: `static/style.css`.
+
+### Developer notes (for extending this fork)
+
+- **Live frontend edits:** `docker-compose.yml` bind-mounts `./static:/app/static:ro`, so frontend changes serve on reload — no image rebuild.
+- **Cache-busting (important):** frontend modules are imported with a static `?v=` query and precached by the service worker. When you change a versioned file, **bump its `?v=` everywhere it's referenced *and* bump `CACHE_NAME` in `static/sw.js`**, or browsers serve the stale module. The served files are always fresh (the static dir is `no-cache` + bind-mounted); the staleness is purely the browser's module/HTTP cache keyed on the unchanged URL.
+- Machine-specific setup notes (paths, secrets, model choices) are kept out of Git via `.gitignore`.
+
+---
+
 ## Quick Start
 
 > `dev` is the default branch and gets the newest changes first. Use [`main`](https://github.com/odysseus-dev/odysseus/tree/main) if you want the more curated branch.
