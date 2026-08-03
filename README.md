@@ -40,6 +40,8 @@ docker compose up -d --build
 
 Everything in the upstream [Quick Start](#quick-start) and [setup guide](docs/setup.md) still applies.
 
+> **macOS note:** port 7000 collides with the **AirPlay Receiver** (AirTunes), so `http://localhost:7000` may fail to load. Set a free host port — e.g. `APP_PORT=7070` — in `.env` before `docker compose up`, then open that port instead. (This is a stock `.env` setting, not a fork change; the compose port is already `${APP_PORT:-7000}`.)
+
 ### Email
 
 - **Inline images auto-load.** Remote and embedded (`cid:`) images render automatically instead of the click-to-"Load all" flow; failed spacer/tracking images are dropped rather than left as "blocked" placeholders, and the per-image download-icon clutter is removed.
