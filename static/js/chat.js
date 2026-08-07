@@ -1463,6 +1463,18 @@ import { wireArrowUpRecall, getUserMessagesFromChatHistory } from './composerArr
         }
         if (_audioAttachments.length) {
           try { uiModule.showToast('Transcribing audio…', { duration: 120000, leadingIcon: 'spinner' }); } catch (_) {}
+          // Fork: render transcripts in verbatim spoken-form — lowercase, no
+          // sentence/pause punctuation (apostrophes + hyphens kept) — instead of
+          // Whisper's cleaned, capitalized, punctuated output.
+          const _toSpokenForm = (t) => String(t || '')
+            .replace(/[‘’]/g, "'")        // curly apostrophes -> straight
+            .replace(/[“”]/g, '')         // curly double quotes -> drop
+            .replace(/[–—…]/g, ' ')  // en/em dash + ellipsis -> space
+            .toLowerCase()
+            .replace(/["!?;:,.]/g, ' ')             // strip sentence/pause punctuation
+            .replace(/\s-\s/g, ' ')                 // spaced hyphen used as a dash -> space
+            .replace(/\s+/g, ' ')
+            .trim();
           for (const { info, file } of _audioAttachments) {
             const label = info.name || 'audio';
             try {
@@ -1470,7 +1482,7 @@ import { wireArrowUpRecall, getUserMessagesFromChatHistory } from './composerArr
               _sttFd.append('file', file, label);
               const _sttRes = await fetch('/api/stt/transcribe', { method: 'POST', credentials: 'same-origin', body: _sttFd });
               if (_sttRes.ok) {
-                const _txt = (((await _sttRes.json()) || {}).text || '').trim();
+                const _txt = _toSpokenForm((((await _sttRes.json()) || {}).text || ''));
                 _audioTranscriptBlock += _txt
                   ? `[Transcript of ${label}]:\n${_txt}\n\n`
                   : `[Transcript of ${label}]: (no speech detected)\n\n`;
