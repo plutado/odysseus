@@ -1791,6 +1791,13 @@ function initAppearance() {
         else localStorage.setItem('odysseusEmailImagesManual', '1');
         return;
       }
+      // Fork customization: "Auto-speak Replies" — read assistant messages aloud
+      // automatically. Wires the (otherwise unreachable) aiTTSManager.autoPlay flag.
+      if (chk.dataset.privacyKey === 'tts-autospeak') {
+        try { localStorage.setItem('odysseusTTSAutoSpeak', chk.checked ? '1' : '0'); } catch (e) {}
+        if (window.aiTTSManager) window.aiTTSManager.autoPlay = chk.checked;
+        return;
+      }
     });
   });
 
@@ -1832,6 +1839,10 @@ function syncPrivacyCheckboxes() {
   // has explicitly opted into manual/click-to-load mode.
   modalEl.querySelectorAll('[data-privacy-key="email-images-auto"]').forEach(function(chk) {
     chk.checked = localStorage.getItem('odysseusEmailImagesManual') !== '1';
+  });
+  // Auto-speak Replies — reflects the persisted TTS auto-play flag (default off).
+  modalEl.querySelectorAll('[data-privacy-key="tts-autospeak"]').forEach(function(chk) {
+    chk.checked = localStorage.getItem('odysseusTTSAutoSpeak') === '1';
   });
 }
 

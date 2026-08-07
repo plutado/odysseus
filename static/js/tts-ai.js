@@ -454,6 +454,9 @@ class AITTSManager {
 
 // Create global AI TTS manager instance
 window.aiTTSManager = new AITTSManager();
+// Fork: restore the "Auto-speak Replies" preference on load (Settings → Chat Area).
+// autoPlay is otherwise unreachable (no upstream UI wires it).
+try { window.aiTTSManager.autoPlay = localStorage.getItem('odysseusTTSAutoSpeak') === '1'; } catch (e) {}
 
 // Function to add AI TTS button to a message element's action bar
 export function addAITTSButton(messageElement, text) {
