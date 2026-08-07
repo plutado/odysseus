@@ -1,7 +1,7 @@
 # routes/stt_routes.py
 """STT API routes — multi-provider (local Whisper, API endpoint, browser)."""
 
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 import logging
 
 from src.upload_limits import read_upload_limited, STT_MAX_AUDIO_BYTES
@@ -23,8 +23,13 @@ def setup_stt_routes(stt_service):
             raise HTTPException(status_code=500, detail=str(e))
 
     @router.post("/transcribe")
-    async def transcribe_audio(file: UploadFile = File(...)):
-        """Transcribe uploaded audio file to text"""
+    async def transcribe_audio(file: UploadFile = File(...), prompt: str = Form(None)):
+        """Transcribe uploaded audio file to text.
+
+        Optional `prompt` is forwarded to the STT engine as Whisper's
+        initial_prompt — used by the audio-attachment flow to bias toward a
+        verbatim, filler-preserving transcript. Mic dictation omits it, so
+        dictation stays clean."""
         try:
             if not stt_service.available:
                 raise HTTPException(
@@ -36,7 +41,7 @@ def setup_stt_routes(stt_service):
             if not audio_bytes:
                 raise HTTPException(status_code=400, detail={"message": "Empty audio file"})
 
-            text = stt_service.transcribe(audio_bytes)
+            text = stt_service.transcribe(audio_bytes, prompt=prompt)
             if text is None:
                 raise HTTPException(
                     status_code=500,

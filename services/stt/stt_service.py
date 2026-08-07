@@ -87,7 +87,7 @@ class STTService:
                 return None
         return self._whisper_model
 
-    def _transcribe_local(self, audio_bytes: bytes, language: str = "") -> Optional[str]:
+    def _transcribe_local(self, audio_bytes: bytes, language: str = "", prompt: Optional[str] = None) -> Optional[str]:
         model = self._get_whisper()
         if not model:
             return None
@@ -101,6 +101,8 @@ class STTService:
             kwargs = {}
             if language:
                 kwargs["language"] = language
+            if prompt:
+                kwargs["initial_prompt"] = prompt
 
             segments, info = model.transcribe(tmp_path, **kwargs)
             text = " ".join(seg.text.strip() for seg in segments)
@@ -116,7 +118,7 @@ class STTService:
 
     # ── API endpoint ──
 
-    def _transcribe_api(self, audio_bytes: bytes, endpoint_id: str, model: str, language: str = "") -> Optional[str]:
+    def _transcribe_api(self, audio_bytes: bytes, endpoint_id: str, model: str, language: str = "", prompt: Optional[str] = None) -> Optional[str]:
         from src.database import SessionLocal, ModelEndpoint
 
         db = SessionLocal()
@@ -139,6 +141,8 @@ class STTService:
         data = {"model": model or "whisper-1"}
         if language:
             data["language"] = language
+        if prompt:
+            data["prompt"] = prompt
 
         try:
             r = httpx.post(url, headers=headers, files=files, data=data, timeout=60)
@@ -153,7 +157,7 @@ class STTService:
 
     # ── Public interface ──
 
-    def transcribe(self, audio_bytes: bytes) -> Optional[str]:
+    def transcribe(self, audio_bytes: bytes, prompt: Optional[str] = None) -> Optional[str]:
         settings = self._load_settings()
         if settings.get("stt_enabled") is False:
             return None
@@ -165,10 +169,10 @@ class STTService:
             return None
 
         if provider == "local":
-            return self._transcribe_local(audio_bytes, language)
+            return self._transcribe_local(audio_bytes, language, prompt=prompt)
         elif provider.startswith("endpoint:"):
             endpoint_id = provider.split(":", 1)[1]
-            return self._transcribe_api(audio_bytes, endpoint_id, model, language)
+            return self._transcribe_api(audio_bytes, endpoint_id, model, language, prompt=prompt)
         else:
             logger.error(f"Unknown STT provider: {provider}")
             return None
