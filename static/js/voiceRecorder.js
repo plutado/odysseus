@@ -67,15 +67,17 @@ function _ensureIndicatorStyles() {
       padding: 8px 14px; box-shadow: 0 6px 24px rgba(0,0,0,0.35);
       font-size: 13px; z-index: 9999; user-select: none;
     }
-    .voice-rec-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0;
-      background: var(--color-recording, #ff3b30);
-      animation: voiceRecPulse 1.1s ease-in-out infinite; }
+    /* Pulsing mic orb — same visual language as Voice Conversation Mode, so
+       "audio is being captured" always looks the same. Level-reactive: the
+       glow scales with the live mic RMS (see _startMeter). */
+    .voice-rec-orb { position: relative; width: 26px; height: 26px; border-radius: 50%;
+      flex-shrink: 0; display: grid; place-items: center;
+      background: color-mix(in srgb, var(--color-recording, #ff3b30) 24%, transparent); }
+    .voice-rec-orb svg { width: 13px; height: 13px; color: var(--color-recording, #ff3b30); z-index: 1; }
+    .voice-rec-orb::after { content: ''; position: absolute; inset: 0; border-radius: 50%;
+      background: var(--color-recording, #ff3b30); opacity: 0.35;
+      transform: scale(var(--orb-level, 0.3)); transition: transform 0.08s linear; }
     .voice-rec-label { opacity: 0.8; }
-    .voice-rec-meter { display: inline-flex; align-items: flex-end; gap: 2px;
-      height: 18px; margin: 0 2px; }
-    .voice-rec-bar { width: 3px; height: 3px; border-radius: 2px;
-      background: color-mix(in srgb, var(--fg, #c9d1d9) 60%, transparent);
-      transition: height 0.07s linear; }
     .voice-rec-time { font-variant-numeric: tabular-nums; font-weight: 600;
       letter-spacing: 0.5px; min-width: 42px; }
     .voice-rec-stop { display: inline-flex; align-items: center; gap: 6px;
@@ -84,8 +86,6 @@ function _ensureIndicatorStyles() {
       font-size: 12px; font-weight: 600; }
     .voice-rec-stop:hover { background: var(--color-recording-hover, #d63031); }
     .voice-rec-stop svg { width: 11px; height: 11px; }
-    @keyframes voiceRecPulse { 0%,100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.35; transform: scale(0.8); } }
   `;
   document.head.appendChild(s);
 }
@@ -104,11 +104,10 @@ function _showRecordingIndicator(stream) {
   bar.className = 'voice-rec-indicator';
   bar.id = 'voice-rec-indicator';
   bar.innerHTML =
-    '<span class="voice-rec-dot"></span>' +
-    '<span class="voice-rec-label">Recording</span>' +
-    '<span class="voice-rec-meter" id="voice-rec-meter">' +
-      '<i class="voice-rec-bar"></i>'.repeat(5) +
+    '<span class="voice-rec-orb" id="voice-rec-orb">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>' +
     '</span>' +
+    '<span class="voice-rec-label">Recording</span>' +
     '<span class="voice-rec-time" id="voice-rec-time">00:00</span>' +
     '<button type="button" class="voice-rec-stop" id="voice-rec-stop" title="Stop recording">' +
       '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>Stop</button>';
@@ -128,8 +127,9 @@ function _hideRecordingIndicator() {
 }
 
 /**
- * Live audio-level meter: analyses the mic stream and drives the bar heights.
- * The analyser is not connected to the output, so there's no feedback/playback.
+ * Live audio-level orb: analyses the mic stream and scales the orb's glow with
+ * the current RMS amplitude (same visual as Voice Conversation Mode). The
+ * analyser is not connected to the output, so there's no feedback/playback.
  */
 function _startMeter(stream) {
   try {
@@ -138,26 +138,22 @@ function _startMeter(stream) {
     _meterCtx = new AC();
     _meterSource = _meterCtx.createMediaStreamSource(stream);
     const analyser = _meterCtx.createAnalyser();
-    analyser.fftSize = 64;
-    analyser.smoothingTimeConstant = 0.7;
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.5;
     _meterSource.connect(analyser);
-    const bins = analyser.frequencyBinCount;
-    const data = new Uint8Array(bins);
-    // Skip the lowest bins (DC offset + low-frequency rumble) — they always read
-    // hot and would otherwise pin the first bar high regardless of speech.
-    const LOW = 2;
-    const usable = Math.max(1, bins - LOW);
-    const bars = Array.prototype.slice.call(document.querySelectorAll('#voice-rec-meter .voice-rec-bar'));
+    const buf = new Uint8Array(analyser.fftSize);
+    const orb = document.getElementById('voice-rec-orb');
     const draw = () => {
-      analyser.getByteFrequencyData(data);
-      for (let i = 0; i < bars.length; i++) {
-        const start = LOW + Math.floor((i / bars.length) * usable);
-        const end = Math.max(start + 1, LOW + Math.floor(((i + 1) / bars.length) * usable));
-        let sum = 0;
-        for (let j = start; j < end; j++) sum += data[j];
-        const v = sum / (end - start);            // 0..255
-        bars[i].style.height = (3 + (v / 255) * 15).toFixed(1) + 'px';
+      analyser.getByteTimeDomainData(buf);
+      let sum = 0;
+      for (let i = 0; i < buf.length; i++) {
+        const x = (buf[i] - 128) / 128;
+        sum += x * x;
       }
+      const rms = Math.sqrt(sum / buf.length);
+      // Map RMS to a visible glow scale, matching the conversation orb.
+      const level = Math.min(1.4, 0.3 + rms * 9);
+      if (orb) orb.style.setProperty('--orb-level', level.toFixed(2));
       _meterRAF = requestAnimationFrame(draw);
     };
     draw();
