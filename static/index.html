@@ -1608,16 +1608,54 @@
               </div>
               <div id="set-ttsVoiceRow" style="display:flex;align-items:center;gap:0.75rem;">
                 <label class="settings-label">Voice</label>
+                <!-- Fork: real Kokoro voices (the voice server passes af_/am_/bf_/bm_ ids
+                     through; invalid names fall back to the default). Ordered best-first
+                     within each group; ⭐ marks the top-quality voices. -->
                 <select id="set-ttsVoiceSelect" class="settings-select">
-                  <option value="alloy">Alloy</option>
-                  <option value="ash">Ash</option>
-                  <option value="coral">Coral</option>
-                  <option value="echo">Echo</option>
-                  <option value="fable">Fable</option>
-                  <option value="nova">Nova</option>
-                  <option value="onyx">Onyx</option>
-                  <option value="sage">Sage</option>
-                  <option value="shimmer">Shimmer</option>
+                  <optgroup label="American · Female">
+                    <option value="af_heart">Heart ⭐ — warm (default)</option>
+                    <option value="af_bella">Bella ⭐ — expressive</option>
+                    <option value="af_nicole">Nicole — soft / ASMR</option>
+                    <option value="af_aoede">Aoede</option>
+                    <option value="af_kore">Kore</option>
+                    <option value="af_sarah">Sarah</option>
+                    <option value="af_nova">Nova</option>
+                    <option value="af_alloy">Alloy</option>
+                    <option value="af_sky">Sky</option>
+                    <option value="af_jessica">Jessica</option>
+                    <option value="af_river">River</option>
+                  </optgroup>
+                  <optgroup label="American · Male">
+                    <option value="am_michael">Michael</option>
+                    <option value="am_fenrir">Fenrir — deep</option>
+                    <option value="am_puck">Puck — lively</option>
+                    <option value="am_echo">Echo</option>
+                    <option value="am_eric">Eric</option>
+                    <option value="am_liam">Liam</option>
+                    <option value="am_onyx">Onyx</option>
+                    <option value="am_adam">Adam</option>
+                    <option value="am_santa">Santa — character</option>
+                  </optgroup>
+                  <optgroup label="British · Female">
+                    <option value="bf_emma">Emma — clearest</option>
+                    <option value="bf_isabella">Isabella</option>
+                    <option value="bf_alice">Alice</option>
+                    <option value="bf_lily">Lily</option>
+                  </optgroup>
+                  <optgroup label="British · Male">
+                    <option value="bm_george">George</option>
+                    <option value="bm_fable">Fable</option>
+                    <option value="bm_daniel">Daniel</option>
+                    <option value="bm_lewis">Lewis</option>
+                  </optgroup>
+                  <optgroup label="OpenAI-compatible (mapped)">
+                    <option value="alloy">alloy</option>
+                    <option value="echo">echo</option>
+                    <option value="fable">fable</option>
+                    <option value="nova">nova</option>
+                    <option value="onyx">onyx</option>
+                    <option value="shimmer">shimmer</option>
+                  </optgroup>
                 </select>
                 <input id="set-ttsVoiceInput" type="text" placeholder="af_heart" style="flex:1;padding:5px;display:none;">
               </div>
