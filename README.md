@@ -55,6 +55,14 @@ Everything in the upstream [Quick Start](#quick-start) and [setup guide](docs/se
 - **New events default to a sync-out calendar.** The new-event form defaults its calendar to a CalDAV-backed one (so events push to the remote, e.g. Google) instead of a local-only calendar, and **remembers the last calendar you used** (`localStorage.odysseusDefaultCalendarHref`). Editing an event keeps its own calendar.
   - Files: `static/js/calendar.js`.
 
+### Chat
+
+- **Attach audio → transcribe on send.** Attach an audio file (`.wav/.mp3/.m4a/.ogg/.flac/…`) to a chat and it's transcribed on send via the STT service, with the transcript injected into the message the (text/vision-only) model receives — so you can attach a recording and ask the model to summarize / answer / translate it. The transcript also shows in your sent message.
+  - **Verbatim spoken-form:** transcripts are lowercased with sentence/pause punctuation stripped (apostrophes and word-internal hyphens kept), rather than Whisper's cleaned/punctuated output. Mic dictation is unaffected (stays clean for composing).
+  - The transcription **engine** is your **local STT config**, not part of this fork — e.g. Whisper, or [CrisperWhisper](https://github.com/nyrahealth/CrisperWhisper) for verbatim capture of fillers/stutters/false-starts. See your local setup doc.
+  - Files: `static/js/chat.js` (frontend); `routes/stt_routes.py` + `services/stt/stt_service.py` (backend — `/api/stt/transcribe` gained an optional `prompt` field forwarded to the STT engine).
+  - ⚠️ **Backend change** (stt routes/service) → `docker compose up -d --build`.
+
 ### Interface
 
 - **Voice recording indicator.** While dictating: a pulsing dot, elapsed `MM:SS` timer, a live audio-level meter, and an explicit **Stop** button.
