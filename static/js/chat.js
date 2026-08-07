@@ -1444,9 +1444,54 @@ import { wireArrowUpRecall, getUserMessagesFromChatHistory } from './composerArr
           }
         }
       }
+
+      // ── Fork: transcribe attached audio on send ──────────────────────────
+      // The chat model is text/vision-only and can't ingest audio. Run any
+      // attached audio files through the local Whisper STT endpoint
+      // (/api/stt/transcribe) and inject the transcript into the message the
+      // model receives (and show it in the bubble), so you can attach a WAV and
+      // ask the model to summarize / answer / translate what was said.
+      let _audioTranscriptBlock = '';
+      if (_pendingAttachInfo) {
+        const _rawAudio = fileHandlerModule.getPendingRaw ? fileHandlerModule.getPendingRaw() : [];
+        const _audioAttachments = [];
+        for (let i = 0; i < _pendingAttachInfo.length; i++) {
+          const a = _pendingAttachInfo[i];
+          const isAudio = (a.mime || '').startsWith('audio/') ||
+            /\.(wav|mp3|m4a|ogg|flac|aac|opus|weba)$/i.test(a.name || '');
+          if (isAudio && _rawAudio[i]) _audioAttachments.push({ info: a, file: _rawAudio[i] });
+        }
+        if (_audioAttachments.length) {
+          try { uiModule.showToast('Transcribing audio…', { duration: 120000, leadingIcon: 'spinner' }); } catch (_) {}
+          for (const { info, file } of _audioAttachments) {
+            const label = info.name || 'audio';
+            try {
+              const _sttFd = new FormData();
+              _sttFd.append('file', file, label);
+              const _sttRes = await fetch('/api/stt/transcribe', { method: 'POST', credentials: 'same-origin', body: _sttFd });
+              if (_sttRes.ok) {
+                const _txt = (((await _sttRes.json()) || {}).text || '').trim();
+                _audioTranscriptBlock += _txt
+                  ? `[Transcript of ${label}]:\n${_txt}\n\n`
+                  : `[Transcript of ${label}]: (no speech detected)\n\n`;
+              } else {
+                const _err = await _sttRes.json().catch(() => ({}));
+                _audioTranscriptBlock += `[Transcript of ${label}]: (transcription failed — ${_err.detail?.message || ('HTTP ' + _sttRes.status)})\n\n`;
+              }
+            } catch (e) {
+              _audioTranscriptBlock += `[Transcript of ${label}]: (transcription error — ${(e && e.message) || e})\n\n`;
+            }
+          }
+          try { uiModule.showToast('Audio transcribed', { leadingIcon: 'check' }); } catch (_) {}
+        }
+      }
+
       let _userMsgEl = null;
       if (!skipBubble) {
-        _userMsgEl = addMessage('user', userDisplay, null, _pendingAttachInfo ? { attachments: _pendingAttachInfo } : null);
+        const _userDisplayOut = _audioTranscriptBlock
+          ? (userDisplay ? userDisplay + '\n\n' : '') + _audioTranscriptBlock.trim()
+          : userDisplay;
+        _userMsgEl = addMessage('user', _userDisplayOut, null, _pendingAttachInfo ? { attachments: _pendingAttachInfo } : null);
       }
       _sendPerf.mark('user_bubble_visible');
       messageInput.value = '';
@@ -1617,6 +1662,10 @@ import { wireArrowUpRecall, getUserMessagesFromChatHistory } from './composerArr
           finalMsg = `In the document, edit these specific sections:\n\n${parts.join('\n\n')}\n\nInstruction: ${msg}`;
         }
       }
+
+      // Fork: prepend the attached-audio transcript so the (text/vision-only)
+      // model receives what was said. (See "transcribe attached audio" above.)
+      if (_audioTranscriptBlock) finalMsg = _audioTranscriptBlock + finalMsg;
 
       // Apply inject prefix/suffix
       const _inject = presetsModule.getInject ? presetsModule.getInject() : { prefix: '', suffix: '' };
