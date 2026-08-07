@@ -65,12 +65,14 @@ Everything in the upstream [Quick Start](#quick-start) and [setup guide](docs/se
 
 ### Voice (speak & listen)
 
+Voice lives in **one place** — the composer mic. Tap it, speak, and your words land in the message box (editable); hit Send and, with Auto-speak on, the reply is read back to you. Speaking and listening both flow through that single control.
+
 - **Auto-speak replies.** Assistant messages can be read aloud automatically (streamed sentence-by-sentence via the TTS service), so a typed *or* spoken message gets a spoken answer.
   - **Toggle:** *Settings → Chat Area → "Auto-speak Replies"*. Persisted in `localStorage.odysseusTTSAutoSpeak`; wires the otherwise-unreachable `aiTTSManager.autoPlay`.
+  - **Answer only — never the reasoning.** The spoken text strips the model's `<think>…</think>` trace, including tags with attributes (`<think time="3">`) and a block that's still open mid-stream, so the thought process is never vocalized.
   - Files: `static/index.html`, `static/js/settings.js`, `static/js/tts-ai.js`.
-- **Voice Conversation Mode (hands-free).** A headset button in the composer toolbar starts a hands-free loop: **mic → transcribe → auto-send → spoken reply → auto-listen**, repeating until you end it (the button again, or `Esc`). Turn-end is **silence-based** — after you start speaking, ~4s of continuous silence sends your turn (voice-activity detection with an ambient-noise calibration on entry). A floating overlay shows the current state (Listening / Transcribing / Thinking / Speaking) with a live mic-level ring, a **Skip** button to cut a reply short and talk, and **End**.
-  - It reuses the existing STT (`/api/stt/transcribe`), TTS (`aiTTSManager`), and chat-send paths; the only new logic is the VAD + turn-taking glue. Requires STT and TTS to be enabled (it forces Auto-speak on for the session and restores your prior setting on exit). Tunables live on `window.__odysseusVAD` (`silenceMs`, `threshold`, `minSpeechMs`).
-  - Files: `static/js/voiceConversation.js` (new), `static/index.html` (toolbar button), `static/app.js` (wiring). Frontend-only — no rebuild.
+- **Unified recording orb.** The mic's recording indicator is a level-reactive pulsing orb (its glow tracks your live mic level), the same visual everywhere audio is being captured.
+  - Files: `static/js/voiceRecorder.js`.
 
 ### Interface
 
