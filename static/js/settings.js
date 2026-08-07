@@ -1804,6 +1804,13 @@ function initAppearance() {
         }
         return;
       }
+      // Fork customization: "Auto-stop Dictation on Pause" — voice dictation
+      // ends itself after a silence (voiceRecorder VAD reads this flag).
+      if (chk.dataset.privacyKey === 'dictation-autostop') {
+        try { localStorage.setItem('odysseusDictationAutoStop', chk.checked ? '1' : '0'); } catch (e) {}
+        try { if (window.__odysseusDictationVAD) window.__odysseusDictationVAD.enabled = chk.checked; } catch (e) {}
+        return;
+      }
     });
   });
 
@@ -1849,6 +1856,10 @@ function syncPrivacyCheckboxes() {
   // Auto-speak Replies — reflects the persisted TTS auto-play flag (default off).
   modalEl.querySelectorAll('[data-privacy-key="tts-autospeak"]').forEach(function(chk) {
     chk.checked = localStorage.getItem('odysseusTTSAutoSpeak') === '1';
+  });
+  // Auto-stop Dictation on Pause — defaults ON (only unchecked when explicitly '0').
+  modalEl.querySelectorAll('[data-privacy-key="dictation-autostop"]').forEach(function(chk) {
+    chk.checked = localStorage.getItem('odysseusDictationAutoStop') !== '0';
   });
 }
 

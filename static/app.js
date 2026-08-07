@@ -26,7 +26,7 @@ import tasksModule from './js/tasks.js?v=20260723tasksbulkfeedback1';
 import calendarModule from './js/calendar.js';
 import notesModule from './js/notes.js';
 import adminModule from './js/admin.js?v=20260716openrouter3';
-import settingsModule from './js/settings.js?v=20260807autospeakbtn1';
+import settingsModule from './js/settings.js?v=20260807voicevad1';
 // Eagerly bind unified minimize/restore behavior across all tool modals.
 import './js/modalManager.js?v=20260723compareicon2';
 // Desktop window tiling — drag a modal near an edge/corner to snap.
@@ -1987,6 +1987,60 @@ function initializeEventListeners() {
       try { uiModule.showToast(next ? 'Auto-speak on — replies will be read aloud' : 'Auto-speak off'); } catch (_) {}
     });
   })();
+
+  // ── Interrupt a spoken reply (barge-in) ──
+  // While the model is reading a reply aloud, show a "Stop speaking" pill and
+  // let Esc halt it. (Tapping the mic also interrupts — see the send handler.)
+  (function initTTSInterrupt() {
+    let pill = null;
+    function ttsActive() {
+      const m = window.aiTTSManager;
+      return !!(m && (m.isPlaying || m._processing || (m._queue && m._queue.length) || m._streamActive));
+    }
+    function stopSpeaking() { try { if (window.aiTTSManager) window.aiTTSManager.stop(); } catch (_) {} hide(); }
+    function ensureStyles() {
+      if (document.getElementById('tts-stop-pill-styles')) return;
+      const s = document.createElement('style');
+      s.id = 'tts-stop-pill-styles';
+      s.textContent =
+        '.tts-stop-pill{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(8px);' +
+        'display:none;align-items:center;gap:8px;background:var(--panel,#161b22);color:var(--fg,#c9d1d9);' +
+        'border:1px solid var(--border,#30363d);border-radius:999px;padding:8px 14px;font-size:13px;' +
+        'font-weight:600;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.35);z-index:9999;opacity:0;' +
+        'transition:opacity .15s,transform .15s;user-select:none;}' +
+        '.tts-stop-pill.show{display:flex;opacity:1;transform:translateX(-50%) translateY(0);}' +
+        '.tts-stop-pill:hover{background:var(--color-recording,#ff3b30);color:#fff;border-color:transparent;}' +
+        '.tts-stop-pill svg{width:14px;height:14px;}';
+      document.head.appendChild(s);
+    }
+    function show() {
+      ensureStyles();
+      if (!pill) {
+        pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'tts-stop-pill';
+        pill.id = 'tts-stop-pill';
+        pill.title = 'Stop speaking (Esc)';
+        pill.innerHTML =
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>' +
+          'Stop speaking';
+        pill.addEventListener('click', stopSpeaking);
+        document.body.appendChild(pill);
+      }
+      pill.classList.add('show');
+    }
+    function hide() { if (pill) pill.classList.remove('show'); }
+    // Lightweight poll — showing/hiding a pill based on a boolean is negligible.
+    setInterval(() => { if (ttsActive()) show(); else hide(); }, 400);
+    document.addEventListener('keydown', (e) => {
+      // Don't hijack Esc while typing; only act when a reply is actually playing.
+      if (e.key !== 'Escape' || !ttsActive()) return;
+      const ae = document.activeElement;
+      if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) return;
+      stopSpeaking();
+    });
+  })();
+
   try { workspaceModule.initWorkspace(); } catch (_) {}
 
   // Document editor toggle (special: uses module panel, not a checkbox)
@@ -4185,6 +4239,9 @@ function startOdysseusApp() {
 
       // If input is empty and STT is enabled, start recording
       if (!hasText && !hasFiles && _isSttEnabled()) {
+        // Barge-in: if the model is speaking a reply, tapping the mic to talk
+        // interrupts it immediately.
+        try { if (window.aiTTSManager) window.aiTTSManager.stop(); } catch (_) {}
         sendBtn.innerHTML = _stopIcon;
         sendBtn.title = 'Stop recording';
         sendBtn.dataset.mode = 'recording';

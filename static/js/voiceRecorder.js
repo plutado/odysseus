@@ -14,6 +14,11 @@ let mediaRecorder = null;
 let audioChunks = [];
 let isRecording = false;
 let _stopping = false;   // true from Stop-click until transcription resolves
+
+// Auto-stop-on-pause (VAD): ends dictation after a silence so you don't have to
+// tap Stop. Reads the live RMS the level meter already computes.
+let _curRms = 0;
+let _vadInterval = 0;
 let recordingStartTime = null;
 let recordingInterval = null;
 let _meterCtx = null, _meterRAF = 0, _meterSource = null;
@@ -129,9 +134,11 @@ function _showRecordingIndicator(stream) {
   if (recordingInterval) clearInterval(recordingInterval);
   recordingInterval = setInterval(_tickTimer, 1000);
   _startMeter(stream);
+  _startVad();
 }
 
 function _hideRecordingIndicator() {
+  _stopVad();
   _stopMeter();
   const bar = document.getElementById('voice-rec-indicator');
   if (bar) bar.remove();
@@ -145,6 +152,7 @@ function _hideRecordingIndicator() {
  */
 function _showTranscribingIndicator() {
   if (recordingInterval) { clearInterval(recordingInterval); recordingInterval = null; }
+  _stopVad();
   _stopMeter();
   const spin = '<svg class="voice-rec-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-dasharray="42" stroke-dashoffset="12" stroke-linecap="round"/></svg>';
   const bar = document.getElementById('voice-rec-indicator');
@@ -194,6 +202,7 @@ function _startMeter(stream) {
         sum += x * x;
       }
       const rms = Math.sqrt(sum / buf.length);
+      _curRms = rms;   // shared with the VAD auto-stop loop
       // Map RMS to a visible glow scale, matching the conversation orb.
       const level = Math.min(1.4, 0.3 + rms * 9);
       if (orb) orb.style.setProperty('--orb-level', level.toFixed(2));
@@ -210,6 +219,55 @@ function _stopMeter() {
   try { if (_meterSource) _meterSource.disconnect(); } catch (e) { /* ignore */ }
   _meterSource = null;
   if (_meterCtx) { try { _meterCtx.close(); } catch (e) { /* ignore */ } _meterCtx = null; }
+}
+
+// ── Auto-stop on pause (VAD) ──
+// Once speech is detected, a continuous silence ends the turn automatically —
+// same effect as tapping Stop. Off if disabled in Settings; all thresholds are
+// live-tunable via window.__odysseusDictationVAD.
+function _vadEnabled() {
+  try {
+    const c = window.__odysseusDictationVAD;
+    if (c && typeof c.enabled === 'boolean') return c.enabled;
+    return localStorage.getItem('odysseusDictationAutoStop') !== '0';   // default on
+  } catch (e) { return true; }
+}
+function _vadCfg() {
+  const c = (typeof window !== 'undefined' && window.__odysseusDictationVAD) || {};
+  return {
+    silenceMs: c.silenceMs || 2500,   // continuous quiet before auto-stop
+    threshold: c.threshold || 0.02,   // RMS above which a frame counts as speech
+    minSpeechMs: c.minSpeechMs || 300,// must speak this long before arming
+    maxMs: c.maxMs || 60000,          // hard cap on a single utterance
+  };
+}
+function _startVad() {
+  _stopVad();
+  if (!_vadEnabled()) return;
+  const cfg = _vadCfg();
+  const start = Date.now();
+  let lastVoice = Date.now();
+  let voiced = 0;
+  let speechStarted = false;
+  let prev = Date.now();
+  _vadInterval = setInterval(() => {
+    if (_stopping) { _stopVad(); return; }
+    const now = Date.now();
+    const dt = now - prev; prev = now;
+    if (_curRms >= cfg.threshold) {
+      lastVoice = now;
+      voiced += dt;
+      if (!speechStarted && voiced >= cfg.minSpeechMs) speechStarted = true;
+    }
+    const silentFor = now - lastVoice;
+    if (speechStarted && (silentFor >= cfg.silenceMs || now - start >= cfg.maxMs)) {
+      _stopVad();
+      stopRecording();   // identical to a manual Stop → transcribe → insert
+    }
+  }, 120);
+}
+function _stopVad() {
+  if (_vadInterval) { clearInterval(_vadInterval); _vadInterval = 0; }
 }
 
 /**
