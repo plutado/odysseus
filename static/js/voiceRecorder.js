@@ -13,6 +13,7 @@
 let mediaRecorder = null;
 let audioChunks = [];
 let isRecording = false;
+let _stopping = false;   // true from Stop-click until transcription resolves
 let recordingStartTime = null;
 let recordingInterval = null;
 let _meterCtx = null, _meterRAF = 0, _meterSource = null;
@@ -86,6 +87,16 @@ function _ensureIndicatorStyles() {
       font-size: 12px; font-weight: 600; }
     .voice-rec-stop:hover { background: var(--color-recording-hover, #d63031); }
     .voice-rec-stop svg { width: 11px; height: 11px; }
+    /* Transcribing state — instant feedback after Stop so the pill never looks
+       stuck on "Recording" while the server works. */
+    .voice-rec-stop.busy { background: transparent; color: var(--fg, #c9d1d9); cursor: default; padding: 4px 8px; }
+    .voice-rec-spin { width: 14px; height: 14px; animation: voiceRecSpin 0.8s linear infinite; }
+    @keyframes voiceRecSpin { to { transform: rotate(360deg); } }
+    .voice-rec-orb.transcribing { background: color-mix(in srgb, var(--accent-primary, #3b82f6) 22%, transparent); }
+    .voice-rec-orb.transcribing svg { color: var(--accent-primary, #3b82f6); }
+    .voice-rec-orb.transcribing::after { background: var(--accent-primary, #3b82f6);
+      animation: voiceRecThinking 1.1s ease-in-out infinite; }
+    @keyframes voiceRecThinking { 0%,100% { opacity: 0.2; transform: scale(0.5); } 50% { opacity: 0.4; transform: scale(0.95); } }
   `;
   document.head.appendChild(s);
 }
@@ -124,6 +135,38 @@ function _hideRecordingIndicator() {
   _stopMeter();
   const bar = document.getElementById('voice-rec-indicator');
   if (bar) bar.remove();
+}
+
+/**
+ * Flip the (still-visible) recording pill into a "Transcribing…" state the
+ * instant Stop is pressed — so there's immediate feedback and the pill never
+ * looks stuck on "Recording" while the server transcribes. Also nudges the
+ * composer send button to a spinner for the same reason.
+ */
+function _showTranscribingIndicator() {
+  if (recordingInterval) { clearInterval(recordingInterval); recordingInterval = null; }
+  _stopMeter();
+  const spin = '<svg class="voice-rec-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-dasharray="42" stroke-dashoffset="12" stroke-linecap="round"/></svg>';
+  const bar = document.getElementById('voice-rec-indicator');
+  if (bar) {
+    const label = bar.querySelector('.voice-rec-label');
+    if (label) label.textContent = 'Transcribing…';
+    const orb = bar.querySelector('.voice-rec-orb');
+    if (orb) { orb.classList.add('transcribing'); orb.style.setProperty('--orb-level', '0.6'); }
+    const time = document.getElementById('voice-rec-time');
+    if (time) time.style.display = 'none';
+    const stop = document.getElementById('voice-rec-stop');
+    if (stop) { stop.disabled = true; stop.classList.add('busy'); stop.title = 'Transcribing…'; stop.innerHTML = spin; }
+  }
+  // Composer button: show a spinner so the click feels responsive. Restored by
+  // _resetRecordingUI() (which clears dataset.mode and re-runs the icon logic).
+  const sendBtn = document.querySelector('.send-btn');
+  if (sendBtn) {
+    sendBtn.dataset.mode = 'transcribing';
+    sendBtn.classList.remove('recording');
+    sendBtn.title = 'Transcribing…';
+    sendBtn.innerHTML = spin;
+  }
 }
 
 /**
@@ -174,6 +217,7 @@ function _stopMeter() {
  */
 function _resetRecordingUI() {
   isRecording = false;
+  _stopping = false;
   _hideRecordingIndicator();
   if (recordingInterval) {
     clearInterval(recordingInterval);
@@ -311,21 +355,20 @@ export function startRecording(onFileCreated, showToast, showError) {
             if (onFileCreated) onFileCreated(audioFile);
           }
         } else if (provider === 'local' || provider.startsWith('endpoint:')) {
-          // Show "Transcribing..." feedback
-          if (showToast) showToast('Transcribing...', 5000);
+          // The pill already shows a "Transcribing…" spinner (from stopRecording).
           try {
             const transcript = await transcribeOnServer(audioBlob);
             if (transcript) {
               insertTranscription(transcript, showToast);
             } else {
-              if (showToast) showToast('No speech detected');
+              if (showToast) showToast('No speech detected — try again');
             }
           } catch (e) {
             console.error('STT transcription error:', e);
-            if (showError) showError('Transcription failed: ' + e.message);
-            // Fallback: attach as file
-            const audioFile = new File([audioBlob], `voice-message-${Date.now()}.webm`, { type: 'audio/webm' });
-            if (onFileCreated) onFileCreated(audioFile);
+            // Don't silently attach the audio as a file — for a text/vision
+            // chat model that's a dead-end and reads as a mystery attachment.
+            // Surface a clear error and let the user just re-record.
+            if (showError) showError('Transcription failed — please try again. (' + e.message + ')');
           }
         } else {
           // STT disabled — attach audio file
@@ -369,7 +412,14 @@ export function startRecording(onFileCreated, showToast, showError) {
  * Stop voice recording
  */
 export function stopRecording() {
+  // Already finishing — ignore extra Stop clicks. Without this guard a second
+  // click (while the first transcription is still in flight) hit the else
+  // branch below and tore down the UI mid-transcription, orphaning the result
+  // so it later surfaced as a stray audio attachment.
+  if (_stopping) return;
   if (mediaRecorder && mediaRecorder.state === 'recording') {
+    _stopping = true;
+    _showTranscribingIndicator();   // instant feedback before the async work
     mediaRecorder.stop();
     // isRecording will be set to false in _resetRecordingUI called from onstop
   } else {
