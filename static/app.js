@@ -20,7 +20,7 @@ import chatRenderer from './js/chatRenderer.js?v=20260722emailfastindex1';
 import sessionModule from './js/sessions.js?v=20260722ctxheader4';
 import memoryModule from './js/memory.js?v=20260722memoryloading1';
 import voiceRecorderModule from './js/voiceRecorder.js';
-import voiceConversationModule from './js/voiceConversation.js?v=20260807voiceconvo1';
+import voiceConversationModule from './js/voiceConversation.js?v=20260807voiceconvo2';
 import censorModule from './js/censor.js';
 import galleryModule from './js/gallery.js';
 import tasksModule from './js/tasks.js?v=20260723tasksbulkfeedback1';

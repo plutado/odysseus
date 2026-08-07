@@ -40,6 +40,7 @@ let _source = null;
 let _recorder = null;
 let _chunks = [];
 let _rafId = 0;
+let _manualEndTurn = false;      // true when the user hit "Send" to end the turn
 let _prevAutoPlay = false;
 let _els = null;                // overlay elements
 
@@ -121,6 +122,8 @@ function _ensureStyles() {
       border: 1px solid var(--border, #30363d); background: transparent; color: var(--fg, #c9d1d9);
     }
     .voice-convo-btn2:hover { background: color-mix(in srgb, var(--fg, #c9d1d9) 10%, transparent); }
+    .voice-convo-btn2.send { border: none; background: var(--accent-primary, #3b82f6); color: #fff; }
+    .voice-convo-btn2.send:hover { filter: brightness(1.08); }
     .voice-convo-btn2.end { border: none; background: var(--color-recording, #ff3b30); color: #fff; }
     .voice-convo-btn2.end:hover { background: var(--color-recording-hover, #d63031); }
     .voice-convo-btn2 svg { width: 12px; height: 12px; }
@@ -134,6 +137,7 @@ function _ensureStyles() {
 const _ICON_HEADSET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 16a2 2 0 0 1-2 2h-1a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h3z"/><path d="M3 16a2 2 0 0 0 2 2h1a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1H3z"/><path d="M21 18a4 4 0 0 1-4 4h-5"/></svg>';
 const _ICON_SKIP = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M5 4l10 8L5 20V4z"/><rect x="17" y="4" width="2.4" height="16" rx="1"/></svg>';
 const _ICON_END = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>';
+const _ICON_SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
 
 function _showOverlay() {
   _ensureStyles();
@@ -148,6 +152,7 @@ function _showOverlay() {
       '<span class="voice-convo-hint" id="voice-convo-hint">Voice conversation</span>' +
     '</div>' +
     '<div class="voice-convo-actions">' +
+      '<button type="button" class="voice-convo-btn2 send" id="voice-convo-done" title="Send what you\'ve said now (don\'t wait for the pause)" style="display:none">' + _ICON_SEND + 'Send</button>' +
       '<button type="button" class="voice-convo-btn2 skip" id="voice-convo-skip" title="Stop speaking and listen now" style="display:none">' + _ICON_SKIP + 'Skip</button>' +
       '<button type="button" class="voice-convo-btn2 end" id="voice-convo-end" title="End voice conversation">' + _ICON_END + 'End</button>' +
     '</div>';
@@ -157,9 +162,11 @@ function _showOverlay() {
     status: wrap.querySelector('#voice-convo-status'),
     hint: wrap.querySelector('#voice-convo-hint'),
     orb: wrap.querySelector('.voice-convo-orb'),
+    done: wrap.querySelector('#voice-convo-done'),
     skip: wrap.querySelector('#voice-convo-skip'),
     end: wrap.querySelector('#voice-convo-end'),
   };
+  _els.done.addEventListener('click', () => _endTurnNow());
   _els.end.addEventListener('click', () => exit());
   _els.skip.addEventListener('click', () => _skipSpeaking());
 }
@@ -176,6 +183,7 @@ function _setState(state, status, hint) {
   _els.wrap.dataset.state = state;
   if (status != null) _els.status.textContent = status;
   if (hint != null) _els.hint.textContent = hint;
+  _els.done.style.display = state === 'listening' ? '' : 'none';
   _els.skip.style.display = state === 'speaking' ? '' : 'none';
   if (state !== 'listening') _els.orb.style.setProperty('--orb-level', '0.2');
 }
@@ -201,7 +209,7 @@ function _startListenTurn() {
   };
   _recorder.start();
 
-  _setState('listening', 'Listening…', 'Speak — pause when you\'re done');
+  _setState('listening', 'Listening…', 'Speak, then pause — or hit Send');
 
   // VAD loop over the persistent analyser.
   const buf = new Uint8Array(_analyser.fftSize);
@@ -260,7 +268,11 @@ function _stopListenTurn() {
 
 async function _handleUtterance(blob) {
   if (!_active) return;
-  if (!blob || blob.size < 1200) {  // basically silence / no capture
+  const manual = _manualEndTurn;
+  _manualEndTurn = false;
+  // Auto-stops on pure silence: bail and keep listening. A manual "Send" is
+  // intentional, so we try to transcribe it even if it's short.
+  if (!manual && (!blob || blob.size < 1200)) {
     _startListenTurn();
     return;
   }
@@ -345,6 +357,15 @@ async function _waitForReplyAndSpeech() {
     await _sleep(150);
   }
   clearInterval(stateWatch);
+}
+
+// "Send": end the current listening turn immediately instead of waiting for
+// the silence timeout — transcribe what's been captured and send it.
+function _endTurnNow() {
+  if (!_active || _state !== 'listening') return;
+  _manualEndTurn = true;
+  _setState('transcribing', 'Got it…', 'Sending your turn');
+  _stopListenTurn();
 }
 
 // "Skip": stop the assistant speaking and jump straight back to listening.
@@ -498,7 +519,15 @@ function init() {
   if (!window._voiceConvoKeyBound) {
     window._voiceConvoKeyBound = true;
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && _active) { e.preventDefault(); exit(); }
+      if (!_active) return;
+      if (e.key === 'Escape') { e.preventDefault(); exit(); return; }
+      // Enter ends the current turn now (like the Send button) — but only when
+      // you're not typing in a field, so normal composing is unaffected.
+      if (e.key === 'Enter' && !e.shiftKey && _state === 'listening') {
+        const ae = document.activeElement;
+        const typing = ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable);
+        if (!typing) { e.preventDefault(); _endTurnNow(); }
+      }
     });
   }
   // Clean up if the tab is closed mid-conversation.
