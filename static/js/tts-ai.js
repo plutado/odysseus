@@ -66,8 +66,16 @@ class AITTSManager {
     }
 
     extractPlainText(content) {
-        // Strip <think>/<thinking> blocks (model reasoning)
-        let cleaned = content.replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi, '');
+        // Strip <think>/<thinking> blocks (model reasoning) so they're never
+        // spoken. Handle two cases the naive regex missed:
+        //   1. Opening tags carry attributes — chat.js rewrites <think> to
+        //      <think time="3"> — so match <think ...> with any attributes.
+        //   2. Mid-stream the block is still OPEN (no </think> yet); without
+        //      the second pass the streaming TTS reads the reasoning aloud
+        //      before the answer arrives. Strip an unclosed block to the end.
+        let cleaned = content
+            .replace(/<think(?:ing)?\b[^>]*>[\s\S]*?<\/think(?:ing)?>/gi, '')
+            .replace(/<think(?:ing)?\b[^>]*>[\s\S]*$/gi, '');
 
         // Create a temporary div to parse HTML/markdown
         const temp = document.createElement('div');
