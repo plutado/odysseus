@@ -63,6 +63,15 @@ Everything in the upstream [Quick Start](#quick-start) and [setup guide](docs/se
   - Files: `static/js/chat.js` (frontend); `routes/stt_routes.py` + `services/stt/stt_service.py` (backend — `/api/stt/transcribe` gained an optional `prompt` field forwarded to the STT engine).
   - ⚠️ **Backend change** (stt routes/service) → `docker compose up -d --build`.
 
+### Voice (speak & listen)
+
+- **Auto-speak replies.** Assistant messages can be read aloud automatically (streamed sentence-by-sentence via the TTS service), so a typed *or* spoken message gets a spoken answer.
+  - **Toggle:** *Settings → Chat Area → "Auto-speak Replies"*. Persisted in `localStorage.odysseusTTSAutoSpeak`; wires the otherwise-unreachable `aiTTSManager.autoPlay`.
+  - Files: `static/index.html`, `static/js/settings.js`, `static/js/tts-ai.js`.
+- **Voice Conversation Mode (hands-free).** A headset button in the composer toolbar starts a hands-free loop: **mic → transcribe → auto-send → spoken reply → auto-listen**, repeating until you end it (the button again, or `Esc`). Turn-end is **silence-based** — after you start speaking, ~4s of continuous silence sends your turn (voice-activity detection with an ambient-noise calibration on entry). A floating overlay shows the current state (Listening / Transcribing / Thinking / Speaking) with a live mic-level ring, a **Skip** button to cut a reply short and talk, and **End**.
+  - It reuses the existing STT (`/api/stt/transcribe`), TTS (`aiTTSManager`), and chat-send paths; the only new logic is the VAD + turn-taking glue. Requires STT and TTS to be enabled (it forces Auto-speak on for the session and restores your prior setting on exit). Tunables live on `window.__odysseusVAD` (`silenceMs`, `threshold`, `minSpeechMs`).
+  - Files: `static/js/voiceConversation.js` (new), `static/index.html` (toolbar button), `static/app.js` (wiring). Frontend-only — no rebuild.
+
 ### Interface
 
 - **Voice recording indicator.** While dictating: a pulsing dot, elapsed `MM:SS` timer, a live audio-level meter, and an explicit **Stop** button.
