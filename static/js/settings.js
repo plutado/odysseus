@@ -916,7 +916,12 @@ async function initTtsSettings() {
     }
   }
 
-  var ttsKeywords = ['tts', 'audio'];
+  // Match endpoints that serve a TTS model. Beyond generic "tts"/"audio",
+  // include local TTS engine names (e.g. Kokoro) so a voice server whose only
+  // model is literally "kokoro" is selectable as a TTS provider instead of
+  // being filtered out (which forced a fallback to the broken in-container
+  // "local" provider on Docker-for-Mac, where Kokoro can't load).
+  var ttsKeywords = ['tts', 'audio', 'kokoro', 'xtts', 'piper', 'bark', 'orpheus', 'parler'];
   try {
     var epRes = await fetch('/api/model-endpoints', { credentials: 'same-origin' });
     var endpoints = await epRes.json();
@@ -924,7 +929,10 @@ async function initTtsSettings() {
       if (!ep.is_enabled) return;
       var hasTTS = (ep.models || []).some(m => ttsKeywords.some(kw => m.toLowerCase().includes(kw)));
       if (!hasTTS) return;
-      var opt = document.createElement('option'); opt.value = 'endpoint:' + ep.id; opt.textContent = ep.name + ' (API)'; provSel.appendChild(opt);
+      // Label local host-gateway voice servers as "(Local)" rather than "(API)".
+      var _b = (ep.base_url || '').toLowerCase();
+      var _isLocal = ep.endpoint_kind === 'local' || /localhost|127\.0\.0\.1|0\.0\.0\.0|host\.docker\.internal|gateway\.docker\.internal/.test(_b);
+      var opt = document.createElement('option'); opt.value = 'endpoint:' + ep.id; opt.textContent = ep.name + (_isLocal ? ' (Local)' : ' (API)'); provSel.appendChild(opt);
     });
   } catch (e) { console.warn('Failed to load endpoints for TTS', e); }
 
