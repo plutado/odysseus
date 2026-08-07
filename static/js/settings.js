@@ -1794,8 +1794,14 @@ function initAppearance() {
       // Fork customization: "Auto-speak Replies" — read assistant messages aloud
       // automatically. Wires the (otherwise unreachable) aiTTSManager.autoPlay flag.
       if (chk.dataset.privacyKey === 'tts-autospeak') {
-        try { localStorage.setItem('odysseusTTSAutoSpeak', chk.checked ? '1' : '0'); } catch (e) {}
-        if (window.aiTTSManager) window.aiTTSManager.autoPlay = chk.checked;
+        // Route through the shared setter so the composer speaker button stays
+        // in lockstep; fall back to the direct wiring if it isn't ready yet.
+        if (window._setAutospeak) {
+          window._setAutospeak(chk.checked);
+        } else {
+          try { localStorage.setItem('odysseusTTSAutoSpeak', chk.checked ? '1' : '0'); } catch (e) {}
+          if (window.aiTTSManager) window.aiTTSManager.autoPlay = chk.checked;
+        }
         return;
       }
     });

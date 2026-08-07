@@ -26,7 +26,7 @@ import tasksModule from './js/tasks.js?v=20260723tasksbulkfeedback1';
 import calendarModule from './js/calendar.js';
 import notesModule from './js/notes.js';
 import adminModule from './js/admin.js?v=20260716openrouter3';
-import settingsModule from './js/settings.js?v=20260722emailfastindex1';
+import settingsModule from './js/settings.js?v=20260807autospeakbtn1';
 // Eagerly bind unified minimize/restore behavior across all tool modals.
 import './js/modalManager.js?v=20260723compareicon2';
 // Desktop window tiling — drag a modal near an edge/corner to snap.
@@ -1951,6 +1951,42 @@ function initializeEventListeners() {
   }
   setupToggle('web-toggle-btn', 'web-toggle', 'web');
   setupToggle('bash-toggle-btn', 'bash-toggle', 'bash');
+
+  // ── Auto-speak (TTS) toggle — composer button + Settings checkbox share one
+  // source of truth (localStorage.odysseusTTSAutoSpeak → aiTTSManager.autoPlay).
+  function _setAutospeak(on, opts) {
+    on = !!on;
+    const persist = !(opts && opts.persist === false);
+    try { if (persist) localStorage.setItem('odysseusTTSAutoSpeak', on ? '1' : '0'); } catch (_) {}
+    try { if (window.aiTTSManager) window.aiTTSManager.autoPlay = on; } catch (_) {}
+    const btn = el('tts-autospeak-btn');
+    if (btn) {
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-pressed', String(on));
+      btn.title = on ? 'Speaking replies aloud — click to mute' : 'Speak replies aloud';
+    }
+    // Keep the Settings → Chat Area checkbox in lockstep.
+    document.querySelectorAll('[data-privacy-key="tts-autospeak"]').forEach((chk) => { chk.checked = on; });
+    return on;
+  }
+  // Expose so settings.js can round-trip through the same function.
+  window._setAutospeak = _setAutospeak;
+
+  (function initAutospeakToggle() {
+    const btn = el('tts-autospeak-btn');
+    if (!btn) return;
+    let on = false;
+    try { on = localStorage.getItem('odysseusTTSAutoSpeak') === '1'; } catch (_) {}
+    _setAutospeak(on, { persist: false });
+    btn.addEventListener('click', () => {
+      let cur = false;
+      try { cur = localStorage.getItem('odysseusTTSAutoSpeak') === '1'; } catch (_) {}
+      const next = _setAutospeak(!cur);
+      // Turning it off should silence anything already playing.
+      if (!next) { try { if (window.aiTTSManager) window.aiTTSManager.stop(); } catch (_) {} }
+      try { uiModule.showToast(next ? 'Auto-speak on — replies will be read aloud' : 'Auto-speak off'); } catch (_) {}
+    });
+  })();
   try { workspaceModule.initWorkspace(); } catch (_) {}
 
   // Document editor toggle (special: uses module panel, not a checkbox)
