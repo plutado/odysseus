@@ -84,6 +84,12 @@ Everything in the upstream [Quick Start](#quick-start) and [setup guide](docs/se
 
 ---
 
+## ⬇︎ Original upstream README (everything below this line)
+
+Everything **above** this line is this fork's additions. **Everything below is the unmodified README from the upstream project, [odysseus-dev/odysseus](https://github.com/odysseus-dev/odysseus)** — kept verbatim for install steps, the feature list, and general reference. None of it is fork-specific, so if you just want to understand or run stock Odysseus, the **[original repository](https://github.com/odysseus-dev/odysseus)** is the source of truth (and has the newest changes).
+
+---
+
 ## Quick Start
 
 > `dev` is the default branch and gets the newest changes first. Use [`main`](https://github.com/odysseus-dev/odysseus/tree/main) if you want the more curated branch.
