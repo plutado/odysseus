@@ -1475,17 +1475,13 @@ import { wireArrowUpRecall, getUserMessagesFromChatHistory } from './composerArr
             .replace(/\s-\s/g, ' ')                 // spaced hyphen used as a dash -> space
             .replace(/\s+/g, ' ')
             .trim();
-          // Verbatim bias: a filler/false-start stream passed as Whisper's
-          // initial_prompt nudges it to keep "um/uh", hesitations, and
-          // repetitions instead of cleaning them. Sent only from the audio-attach
-          // path, so mic dictation stays clean.
-          const _VERBATIM_PROMPT = 'so um yeah i was uh like you know thinking hmm well er';
+          // (The STT engine is CrisperWhisper — verbatim by design — so no
+          // verbatim initial_prompt is needed here.)
           for (const { info, file } of _audioAttachments) {
             const label = info.name || 'audio';
             try {
               const _sttFd = new FormData();
               _sttFd.append('file', file, label);
-              _sttFd.append('prompt', _VERBATIM_PROMPT);
               const _sttRes = await fetch('/api/stt/transcribe', { method: 'POST', credentials: 'same-origin', body: _sttFd });
               if (_sttRes.ok) {
                 const _txt = _toSpokenForm((((await _sttRes.json()) || {}).text || ''));
