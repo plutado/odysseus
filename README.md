@@ -65,19 +65,19 @@ Everything in the upstream [Quick Start](#quick-start) and [setup guide](docs/se
 
 ### Voice (speak & listen)
 
-Voice lives in **one place** — the composer mic. Tap it, speak, and your words land in the message box (editable); hit Send and, with Auto-speak on, the reply is read back to you. Speaking and listening both flow through that single control.
+Voice lives in **one place** — the composer toolbar. The **mic** is how you talk to the model (tap, speak, and your words land in the message box, editable; hit Send); the **speaker** button beside it is how the model talks back. Both halves sit together, so there's no hunting through settings.
 
-- **Auto-speak replies.** Assistant messages can be read aloud automatically (streamed sentence-by-sentence via the TTS service), so a typed *or* spoken message gets a spoken answer.
-  - **Toggle:** *Settings → Chat Area → "Auto-speak Replies"*. Persisted in `localStorage.odysseusTTSAutoSpeak`; wires the otherwise-unreachable `aiTTSManager.autoPlay`.
-  - **Answer only — never the reasoning.** The spoken text strips the model's `<think>…</think>` trace, including tags with attributes (`<think time="3">`) and a block that's still open mid-stream, so the thought process is never vocalized.
-  - Files: `static/index.html`, `static/js/settings.js`, `static/js/tts-ai.js`.
-- **Unified recording orb.** The mic's recording indicator is a level-reactive pulsing orb (its glow tracks your live mic level), the same visual everywhere audio is being captured.
+- **Talk to it — dictation with responsive Stop.** Tap the mic, speak, tap **Stop**, and the transcript drops into the message box for you to edit and send.
+  - **Instant feedback:** the moment you hit Stop, the pill flips to a "Transcribing…" spinner (and the composer button shows one too) so it never looks stuck on "Recording." Extra Stop clicks are ignored while the result is in flight, so a double-click can't orphan the transcription. On failure you get a clear "try again" message rather than a silent, useless audio attachment.
   - Files: `static/js/voiceRecorder.js`.
+- **It talks back — Auto-speak, toggled from the composer.** A **speaker** button in the composer toolbar toggles reading replies aloud (streamed sentence-by-sentence via the TTS service). It shares one source of truth with *Settings → Chat Area → "Auto-speak Replies"* (`localStorage.odysseusTTSAutoSpeak` → `aiTTSManager.autoPlay`, via `window._setAutospeak`), so toggling either keeps the other in sync; muting also stops any reply already playing.
+  - **Answer only — never the reasoning.** The spoken text strips the model's `<think>…</think>` trace, including tags with attributes (`<think time="3">`) and a block that's still open mid-stream, so the thought process is never vocalized.
+  - Files: `static/index.html`, `static/app.js`, `static/js/settings.js`, `static/js/tts-ai.js`.
+- **Unified recording orb.** The recording indicator is a level-reactive pulsing orb (its glow tracks your live mic level) — the same visual everywhere audio is being captured — with the elapsed `MM:SS` timer and an explicit **Stop**.
+  - Files: `static/js/voiceRecorder.js`, `static/style.css`.
 
 ### Interface
 
-- **Voice recording indicator.** While dictating: a pulsing dot, elapsed `MM:SS` timer, a live audio-level meter, and an explicit **Stop** button.
-  - Files: `static/js/voiceRecorder.js`, `static/style.css`.
 - **Larger sidebar navigation.** Sidebar nav items and section headers are set to 14px for readability (they otherwise inherit a smaller root size).
   - Files: `static/style.css`.
 
