@@ -1822,6 +1822,24 @@ function initAppearance() {
     });
   });
 
+  // Fork: backend-pref-backed toggles (data-pref-key) — unlike the localStorage
+  // privacy toggles above, these persist server-side via /api/prefs (e.g.
+  // app_awareness, read by chat_helpers.py). Default on unless explicitly false.
+  modalEl.querySelectorAll('[data-pref-key]').forEach(function(chk) {
+    if (chk.dataset.prefBound) return;
+    chk.dataset.prefBound = '1';
+    chk.addEventListener('change', function() {
+      var key = chk.dataset.prefKey;
+      fetch(window.location.origin + '/api/prefs/' + key, {
+        method: 'PUT',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: chk.checked })
+      }).then(function(r) { if (!r.ok) throw new Error('PUT ' + r.status); })
+        .catch(function() { chk.checked = !chk.checked; });
+    });
+  });
+
   // Per-section reset buttons (arrow-circle-back icon in each card's h2).
   // Removes only the keys belonging to this section from the persisted
   // visibility map so other sections keep their user settings.
@@ -1868,6 +1886,15 @@ function syncPrivacyCheckboxes() {
   // Auto-stop Dictation on Pause — defaults ON (only unchecked when explicitly '0').
   modalEl.querySelectorAll('[data-privacy-key="dictation-autostop"]').forEach(function(chk) {
     chk.checked = localStorage.getItem('odysseusDictationAutoStop') !== '0';
+  });
+  // Fork: backend-pref toggles (data-pref-key) — reflect the server value
+  // (default on unless explicitly false).
+  modalEl.querySelectorAll('[data-pref-key]').forEach(function(chk) {
+    var key = chk.dataset.prefKey;
+    fetch(window.location.origin + '/api/prefs/' + key, { credentials: 'same-origin' })
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(d) { if (d) chk.checked = d.value !== false; })
+      .catch(function() {});
   });
 }
 

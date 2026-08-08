@@ -666,6 +666,95 @@ def _session_is_research_spinoff(sess) -> bool:
     return False
 
 
+def _build_app_state_message(owner, uprefs, chat_processor):
+    """Fork: a small live snapshot of the user's Odysseus workspace, injected as
+    a non-cached context message so the model can answer questions about their
+    actual setup (how many email accounts, which calendars, memory count, etc.).
+
+    Every source is wrapped independently — if one errors or is unavailable, it's
+    simply omitted rather than breaking the chat. Returns a context message dict
+    or None if nothing could be gathered.
+    """
+    facts = []
+
+    # Email accounts (owner-scoped, mirrors list_email_accounts filtering).
+    try:
+        from core.database import SessionLocal, EmailAccount
+        from sqlalchemy import and_, or_
+        db = SessionLocal()
+        try:
+            q = db.query(EmailAccount)
+            if owner:
+                unowned = or_(EmailAccount.owner == None, EmailAccount.owner == "")  # noqa: E711
+                same = or_(EmailAccount.imap_user == owner, EmailAccount.from_address == owner)
+                q = q.filter(or_(EmailAccount.owner == owner, and_(unowned, same)))
+            names = [
+                (a.name or a.from_address or a.imap_user or "account")
+                for a in q.all() if a.enabled
+            ]
+        finally:
+            db.close()
+        if names:
+            facts.append(f"Email: {len(names)} account(s) connected — " + ", ".join(names) + ".")
+        else:
+            facts.append("Email: no accounts connected.")
+    except Exception:
+        pass
+
+    # Calendars.
+    try:
+        from core.database import SessionLocal, CalendarCal
+        db = SessionLocal()
+        try:
+            q = db.query(CalendarCal)
+            if owner:
+                q = q.filter(CalendarCal.owner == owner)
+            names = [c.name for c in q.all() if c.name]
+        finally:
+            db.close()
+        if names:
+            facts.append(f"Calendars: {len(names)} — " + ", ".join(names) + ".")
+    except Exception:
+        pass
+
+    # Saved memories + whether memory is on.
+    try:
+        mem = chat_processor.memory_manager.load(owner=owner) or []
+        on = uprefs.get("memory_enabled", True)
+        facts.append(f"Memory: {len(mem)} saved ({'on' if on else 'off'}).")
+    except Exception:
+        pass
+
+    # Personal documents indexed for RAG.
+    try:
+        pdm = chat_processor.personal_docs_manager
+        stats = pdm.get_stats() if hasattr(pdm, "get_stats") else None
+        n = stats.get("total_documents") if isinstance(stats, dict) else None
+        if n:
+            facts.append(f"Documents indexed for search (RAG): {n}.")
+    except Exception:
+        pass
+
+    # Default chat model.
+    try:
+        dm = (uprefs.get("default_model") or "").strip()
+        if dm:
+            facts.append(f"Default chat model: {dm}.")
+    except Exception:
+        pass
+
+    if not facts:
+        return None
+
+    from src.prompt_security import untrusted_context_message
+    body = (
+        "Current snapshot of THIS user's Odysseus workspace (it changes over "
+        "time; use it to answer questions about their setup, but don't recite it "
+        "unprompted):\n- " + "\n- ".join(facts)
+    )
+    return untrusted_context_message("odysseus workspace state", body)
+
+
 async def build_chat_context(
     sess,
     request,
@@ -736,6 +825,10 @@ async def build_chat_context(
     # Skills injection respects its own enable toggle (mirrors memory_enabled).
     # When off, the "Available skills" index is not added to the prompt.
     skills_enabled = not incognito and uprefs.get("skills_enabled", True)
+    # Fork: app self-awareness — inject Odysseus's capabilities (static) and a
+    # live workspace snapshot (dynamic) so the model can answer "what can this
+    # app do?" and questions about the user's setup. Default on.
+    app_awareness = uprefs.get("app_awareness", True)
     if not allow_tool_preprocessing:
         mem_enabled = False
         skills_enabled = False
@@ -779,6 +872,7 @@ async def build_chat_context(
         agent_mode=agent_mode,
         incognito=incognito,
         use_skills=skills_enabled,
+        use_app_context=app_awareness,
     )
     if use_rag is not None or is_research_spinoff or casual_low_signal:
         _preface_kwargs["use_rag"] = use_rag_val
@@ -829,6 +923,22 @@ async def build_chat_context(
                 messages.append(_dt_msg)
         except Exception:
             logger.debug("Failed to add current date/time context", exc_info=True)
+
+    # Fork: live workspace snapshot (app self-awareness, "deeper" half). A
+    # NON-cached context message with the user's current setup (email accounts,
+    # calendars, memory, indexed docs, default model) so the model can answer
+    # questions about their workspace. Gated by the app_awareness pref and
+    # skipped for greetings/incognito to keep it cheap. Fully defensive.
+    if app_awareness and not casual_low_signal and not incognito:
+        try:
+            _state_msg = _build_app_state_message(user, uprefs, chat_processor)
+            if _state_msg:
+                if messages and messages[-1].get("role") == "user":
+                    messages.insert(len(messages) - 1, _state_msg)
+                else:
+                    messages.append(_state_msg)
+        except Exception:
+            logger.debug("Failed to add app-state context", exc_info=True)
 
     # Auto-compact
     messages, context_length, was_compacted = await maybe_compact(

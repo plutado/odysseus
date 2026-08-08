@@ -312,6 +312,7 @@ class ChatProcessor:
         agent_mode: bool = False,
         incognito: bool = False,
         use_skills: bool = True,
+        use_app_context: bool = True,
     ) -> Tuple[List[Dict[str, str]], List[Dict[str, Any]], List[Dict[str, str]]]:
         """Build the context preface for LLM calls.
 
@@ -346,11 +347,13 @@ class ChatProcessor:
         })
         # Fork: give the model accurate self-knowledge of the Odysseus app it runs
         # inside (static → stays in the KV-cached system prefix). See
-        # ODYSSEUS_APP_CONTEXT above.
-        preface.append({
-            "role": "system",
-            "content": ODYSSEUS_APP_CONTEXT,
-        })
+        # ODYSSEUS_APP_CONTEXT above. Gated by the app_awareness pref; the live
+        # workspace snapshot is added separately (non-cached) in build_chat_context.
+        if use_app_context:
+            preface.append({
+                "role": "system",
+                "content": ODYSSEUS_APP_CONTEXT,
+            })
 
         # Memory: core pinned facts + relevant pinned/extended recall.
         self._last_used_memories = []  # track what was injected
