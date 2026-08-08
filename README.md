@@ -57,6 +57,9 @@ Everything in the upstream [Quick Start](#quick-start) and [setup guide](docs/se
 
 ### Chat
 
+- **The assistant knows what Odysseus is.** The chat model is a generic LLM with no inherent knowledge of the app it runs inside, so out of the box it can't tell you what Odysseus can do. A static "app self-knowledge" system message is injected into every main chat, giving the model an accurate rundown of the built-in areas (Chat/Agents, Email, Calendar, Tasks & Notes, Brain/Memory, Documents/Library, Gallery, Deep Research, Compare, Cookbook) so it can answer "what can you / this app do?" and point you to the right place instead of guessing or inventing features. It's kept **static** so it stays inside the KV-cached system prefix (near-zero cost after the first turn) and doesn't leak per-turn data.
+  - Edit the text (or the feature list) in `src/chat_processor.py` → `ODYSSEUS_APP_CONTEXT`; it's injected in `build_context_preface`. Applies to the main chat only (not the email/memory/etc. sub-prompts).
+  - ⚠️ **Backend change** → `docker compose up -d --build`.
 - **Attach audio → transcribe on send.** Attach an audio file (`.wav/.mp3/.m4a/.ogg/.flac/…`) to a chat and it's transcribed on send via the STT service, with the transcript injected into the message the (text/vision-only) model receives — so you can attach a recording and ask the model to summarize / answer / translate it. The transcript also shows in your sent message.
   - **Verbatim spoken-form:** transcripts are lowercased with sentence/pause punctuation stripped (apostrophes and word-internal hyphens kept), rather than Whisper's cleaned/punctuated output. Mic dictation is unaffected (stays clean for composing).
   - The transcription **engine** is your **local STT config**, not part of this fork — e.g. Whisper, or [CrisperWhisper](https://github.com/nyrahealth/CrisperWhisper) for verbatim capture of fillers/stutters/false-starts. See your local setup doc.

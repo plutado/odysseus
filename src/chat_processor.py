@@ -13,6 +13,44 @@ from src.prompt_security import UNTRUSTED_CONTEXT_POLICY, untrusted_context_mess
 logger = logging.getLogger(__name__)
 
 
+# ── Fork: Odysseus app self-knowledge ────────────────────────────────────────
+# The chat model is a general LLM with no inherent knowledge of the Odysseus app
+# it runs inside — as far as it knows, it's a bare model. This static system
+# message gives it accurate awareness of the workspace's built-in areas so it can
+# answer "what can you / this app do?" and point the user to the right place,
+# WITHOUT inventing features. Keep it static (no per-turn data) so it stays part
+# of the byte-identical, KV-cached system prefix (see build_context_preface's
+# docstring). Edit this text to match the build's real capabilities; to disable
+# it entirely, stop appending it in build_context_preface below.
+ODYSSEUS_APP_CONTEXT = (
+    "For reference, you are running inside Odysseus — a self-hosted AI workspace "
+    "the user runs on their own machine. It is more than a chat box: it has these "
+    "built-in areas, reachable from the left navigation. Describe them accurately "
+    "if the user asks what you or the app can do, and help them find and use each; "
+    "never invent capabilities beyond this list, and if unsure, say so.\n"
+    "- Chat & Agents — this conversation. In agent mode you can call tools, run "
+    "shell commands, read and write files, search the web, and manage skills and "
+    "memory.\n"
+    "- Email — an IMAP/SMTP inbox with triage, tags, AI summaries, reminders, and "
+    "reply drafts written in the user's style.\n"
+    "- Calendar — events and reminders with CalDAV sync (e.g. Google Calendar).\n"
+    "- Tasks & Notes — to-dos, quick notes, and scheduled agent tasks that run on "
+    "their own.\n"
+    "- Brain (Memory) — long-term facts the assistant saves and recalls across "
+    "chats.\n"
+    "- Documents / Library — a writing-first editor with AI edits, plus a document "
+    "library with search (RAG) over uploaded files.\n"
+    "- Gallery — image generation and editing.\n"
+    "- Deep Research — multi-step web research that reads sources and writes a "
+    "cited report.\n"
+    "- Compare — run one prompt across several models side by side.\n"
+    "- Cookbook — hardware-aware recommendations for local models, with download "
+    "and serving help.\n"
+    "You cannot click the interface yourself, but you can explain exactly where a "
+    "feature lives and how to use it."
+)
+
+
 def _clean_search_query(query: str, max_len: int = 200) -> str:
     """Strip fenced code blocks from a search query while preserving inline
     code text.
@@ -305,6 +343,13 @@ class ChatProcessor:
         preface.append({
             "role": "system",
             "content": UNTRUSTED_CONTEXT_POLICY,
+        })
+        # Fork: give the model accurate self-knowledge of the Odysseus app it runs
+        # inside (static → stays in the KV-cached system prefix). See
+        # ODYSSEUS_APP_CONTEXT above.
+        preface.append({
+            "role": "system",
+            "content": ODYSSEUS_APP_CONTEXT,
         })
 
         # Memory: core pinned facts + relevant pinned/extended recall.
