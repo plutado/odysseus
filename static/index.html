@@ -1591,10 +1591,13 @@
             <div style="display:flex;flex-direction:column;gap:0.5rem;">
               <div style="display:flex;align-items:center;gap:0.75rem;">
                 <label class="settings-label">Provider</label>
+                <!-- Fork: the stock "local" option (in-container Kokoro) is removed —
+                     it needs CUDA and can't load on Docker-for-Mac, and sitting next to
+                     the real host voice server it was a footgun that silently broke TTS.
+                     The working local voice server appears as a "(Local)" endpoint below. -->
                 <select id="set-ttsProviderSelect" class="settings-select">
                   <option value="disabled">Disabled</option>
                   <option value="browser">Browser (built-in)</option>
-                  <option value="local">Local (Kokoro-82M)</option>
                 </select>
               </div>
               <div id="set-ttsModelRow" style="display:flex;align-items:center;gap:0.75rem;">
