@@ -34,8 +34,16 @@ class TTSService:
     Providers:
       "disabled"        — no TTS
       "browser"         — client-side Web Speech API (no server synthesis)
-      "local"           — Kokoro-82M on GPU
+      "local"           — in-container Kokoro-82M on a CUDA GPU (see note below)
       "endpoint:<id>"   — OpenAI-compatible /audio/speech via ModelEndpoint
+
+    FORK NOTE (Docker-for-Mac): the "local" provider is upstream code for CUDA
+    hosts and is NOT used here — `kokoro` isn't installed in the container and it
+    requires CUDA, which Docker on macOS can't provide. On this setup, Kokoro TTS
+    runs *natively on the host* (mlx-audio + Metal) and is reached as an
+    "endpoint:<id>" provider (host.docker.internal:8720). The "local" option was
+    removed from the settings UI; the code path below is kept only for upstream
+    parity and is effectively dead on this fork.
     """
 
     def __init__(self, cache_dir: str = TTS_CACHE_DIR):
@@ -221,6 +229,10 @@ class TTSService:
         audio_data = None
 
         if provider == "local":
+            # FORK NOTE: dead path on Docker-for-Mac — in-container Kokoro needs
+            # CUDA + the `kokoro` package (neither present), so this always warns
+            # and returns None. The working local Kokoro is the host voice server
+            # reached via the "endpoint:" branch below. Kept for upstream parity.
             kokoro = self._get_kokoro()
             if kokoro and kokoro.available:
                 audio_data = kokoro.synthesize_raw(text, voice)
@@ -282,7 +294,14 @@ class TTSService:
 
 
 class _KokoroPipeline:
-    """Encapsulates the Kokoro-82M local GPU pipeline."""
+    """Encapsulates the Kokoro-82M local GPU pipeline.
+
+    FORK NOTE (Docker-for-Mac): unused on this fork. `_init` below bails unless
+    `torch.cuda.is_available()`, and the `kokoro` package isn't installed in the
+    container, so this never loads here. Kokoro TTS runs natively on the host
+    (mlx-audio + Metal) and is consumed as an "endpoint:" provider, not through
+    this class. Left intact for parity with upstream (which targets CUDA hosts).
+    """
 
     def __init__(self):
         self.pipeline = None
