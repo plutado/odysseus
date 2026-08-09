@@ -108,6 +108,7 @@ Voice lives in **one place** — the composer toolbar. The **mic** is how you ta
 
 - **Live frontend edits:** `docker-compose.yml` bind-mounts `./static:/app/static:ro`, so frontend changes serve on reload — no image rebuild. **Backend changes** (anything under `routes/`, etc.) are baked into the image and need `docker compose up -d --build` to take effect.
 - **Cache-busting (important):** frontend modules are imported with a static `?v=` query and precached by the service worker. When you change a versioned file, **bump its `?v=` everywhere it's referenced *and* bump `CACHE_NAME` in `static/sw.js`**, or browsers serve the stale module. The served files are always fresh (the static dir is `no-cache` + bind-mounted); the staleness is purely the browser's module/HTTP cache keyed on the unchanged URL.
+  - The SW serves the **app shell (`/`) network-first** (fork change) so a fresh `index.html` — and therefore the new `?v=` CSS/JS — loads on **one** reload, instead of the old stale-while-revalidate behavior that took two reloads and could pin an old shell indefinitely. A one-time cache clear is still needed to *install* a new SW when the old one is stuck (`Application → Storage → Clear site data`, or unregister via the console).
 - Machine-specific setup notes (paths, secrets, model choices) are kept out of Git via `.gitignore`.
 
 ---

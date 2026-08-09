@@ -41189,6 +41189,9 @@ body.theme-frosted .modal {
    checklist 14px, card 15px). */
 .notes-pane .note-card,
 .notes-pane .note-card-title,
+.notes-pane .note-checklist-preview,
+.notes-pane .note-check-text,
+.notes-pane .note-checkbox,
 .notes-pane .note-cl-text,
 .notes-pane .note-cl-text-reader,
 .notes-pane .note-cl-quickadd-input,
@@ -41196,6 +41199,8 @@ body.theme-frosted .modal {
 .notes-pane .memory-search-input,
 .notes-pane #notes-search,
 .notes-pane .notes-select-trigger,
+.notes-pane .notes-pane-title,
+.notes-pane .notes-header-btn-label,
 .notes-pane .notes-label-chip,
 .note-fullscreen-overlay .note-card-title,
 .note-fullscreen-overlay .note-cl-text,
