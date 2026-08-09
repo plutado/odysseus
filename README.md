@@ -27,7 +27,15 @@
 
 ## Fork customizations
 
-`plutado/odysseus`, branch **`local-customizations`**. These are quality-of-life tweaks layered on upstream Odysseus. Most are **frontend + config** (JavaScript / CSS / HTML + `docker-compose.yml`) and serve live via the static bind-mount; there is also **one small backend fix** (see [Models & endpoints](#models--endpoints)) which requires a one-time image rebuild (`docker compose up -d --build`).
+`plutado/odysseus`, branch **`local-customizations`**. Quality-of-life features and fixes layered on upstream Odysseus, tuned for a **self-hosted macOS setup** (Odysseus in Docker; the ML models run natively on the host over Metal). Most changes are **frontend + config** (JavaScript / CSS / HTML + `docker-compose.yml`) and serve live via the static bind-mount; a handful are **backend** changes baked into the image and need a one-time rebuild (`docker compose up -d --build`) — each is flagged with ⚠️ below.
+
+**Highlights** (details in the sections that follow):
+
+- **[Voice — speak & listen](#voice-speak--listen).** One composer mic: dictation with responsive Stop and auto-stop-on-pause; spoken replies with a real **Kokoro voice picker** (28 English voices) and answer-only speech (never the reasoning); barge-in to interrupt.
+- **[App self-awareness](#chat).** The chat model now *knows what Odysseus is* and — in agent mode — actually **does** things (creates notes/events, manages memory, runs research…) instead of just describing them, backed by a live snapshot of your workspace. Requires local endpoints to have tool-calling enabled (⚠️).
+- **[Readable everywhere](#interface).** A two-tier font floor — **16px** primary / **14px** absolute minimum — across the whole app (panels, tool modals, nav, composer), tunable from one CSS variable.
+- **[Email](#email) & [Calendar](#calendar).** Inline images auto-load, numbers render correctly; new calendar events default to a CalDAV sync-out calendar.
+- **[Models & endpoints](#models--endpoints).** Local host-gateway endpoints are detected as *local* (so their models appear + tool-calling works).
 
 ### Run this fork
 
