@@ -32,6 +32,8 @@
   /* Fork: app-wide readable-text floor. Panels/components below reference this
      so the minimum font size is tuned in one place. */
   --app-min-font: 16px;
+  /* Absolute floor for the smallest readable text (badges/meta stay above this). */
+  --app-min-font-min: 14px;
 
   /* Syntax highlighting */
   --hl-bg: #1e2228;
@@ -41628,3 +41630,539 @@ button.cal-btn { font-size: var(--app-min-font); }
 .settings-system-logs-search { font-size: var(--app-min-font); }
 .settings-system-logs-select { font-size: var(--app-min-font); }
 .settings-system-logs-autopoll-container { font-size: var(--app-min-font); }
+
+/* ── Fork: app-wide 14px hard floor for small readable text (534 selectors; pure decoration, root/density, and already-16px text excluded). ── */
+.export-dropdown-item { font-size: var(--app-min-font-min); }
+.rail-notes-badge { font-size: var(--app-min-font-min); }
+.minimized-dock-chip { font-size: var(--app-min-font-min); }
+.rail-hover-label { font-size: var(--app-min-font-min); }
+.section-header-flex h4, .section-header-flex .section-title { font-size: var(--app-min-font-min); }
+.session-bulk-bar { font-size: var(--app-min-font-min); }
+.list-item, .models-row { font-size: var(--app-min-font-min); }
+.list-item button { font-size: var(--app-min-font-min); }
+.chat-meta { font-size: var(--app-min-font-min); }
+.incognito-btn { font-size: var(--app-min-font-min); }
+.incognito-label { font-size: var(--app-min-font-min); }
+.rag-sources { font-size: var(--app-min-font-min); }
+.rag-sources summary { font-size: var(--app-min-font-min); }
+.rag-similarity { font-size: var(--app-min-font-min); }
+.rag-snippet { font-size: var(--app-min-font-min); }
+.rag-file-delete { font-size: var(--app-min-font-min); }
+.rag-file-size { font-size: var(--app-min-font-min); }
+.rag-upload-zone { font-size: var(--app-min-font-min); }
+.msg .timestamp { font-size: var(--app-min-font-min); }
+.plan-mode-status { font-size: var(--app-min-font-min); }
+.plan-inline-execute, .plan-inline-clear { font-size: var(--app-min-font-min); }
+.send-btn-label { font-size: var(--app-min-font-min); }
+.mode-toggle-btn { font-size: var(--app-min-font-min); }
+.chat-context-popup { font-size: var(--app-min-font-min); }
+.chat-context-compact-btn { font-size: var(--app-min-font-min); }
+.model-picker-btn { font-size: var(--app-min-font-min); }
+.overflow-menu-item { font-size: var(--app-min-font-min); }
+.copy-btn { font-size: var(--app-min-font-min); }
+pre.pre-compact .copy-code, pre.pre-compact .edit-code, pre.pre-compact .run-code { font-size: var(--app-min-font-min); }
+.code-runner-copy-inline { font-size: var(--app-min-font-min); }
+.toast { font-size: var(--app-min-font-min); }
+.small-note { font-size: var(--app-min-font-min); }
+.models-row button { font-size: var(--app-min-font-min); }
+.diff-toolbar-btn { font-size: var(--app-min-font-min); }
+#email-lib-modal .email-reader-meta { font-size: var(--app-min-font-min) !important; }
+.session-loading-state { font-size: var(--app-min-font-min); }
+.modal-dock-item { font-size: var(--app-min-font-min); }
+#agent-indicator { font-size: var(--app-min-font-min); }
+#custom-preset-modal .modal-body label { font-size: var(--app-min-font-min); }
+#custom-preset-modal .modal-body textarea, #custom-preset-modal .modal-body input[type="text"] { font-size: var(--app-min-font-min); }
+#custom-preset-modal .modal-footer button { font-size: var(--app-min-font-min); }
+.toolbar-hint { font-size: var(--app-min-font-min); }
+.vis-icon-text { font-size: var(--app-min-font-min); }
+.vis-label { font-size: var(--app-min-font-min); }
+.vis-hint { font-size: var(--app-min-font-min); }
+.dropdown-item-compact { font-size: var(--app-min-font-min); }
+.session-rename-input { font-size: var(--app-min-font-min); }
+#stop-recording { font-size: var(--app-min-font-min); }
+.search-group-header { font-size: var(--app-min-font-min); }
+.search-result-role { font-size: var(--app-min-font-min); }
+.search-result-snippet { font-size: var(--app-min-font-min); }
+.search-result-time { font-size: var(--app-min-font-min); }
+.search-empty { font-size: var(--app-min-font-min); }
+#theme-popup .theme-popup-sub { font-size: var(--app-min-font-min); }
+.theme-custom-label { font-size: var(--app-min-font-min); }
+.color-row label { font-size: var(--app-min-font-min); }
+.theme-custom-divider { font-size: var(--app-min-font-min); }
+.theme-save-row input { font-size: var(--app-min-font-min); }
+.theme-save-row button { font-size: var(--app-min-font-min); }
+.theme-save-error { font-size: var(--app-min-font-min); }
+.theme-io-btn { font-size: var(--app-min-font-min); }
+.theme-fd-label { font-size: var(--app-min-font-min); }
+.theme-fd-select { font-size: var(--app-min-font-min); }
+.harmony-generate-btn { font-size: var(--app-min-font-min); }
+#theme-reset-btn { font-size: var(--app-min-font-min); }
+.theme-adv-toggle { font-size: var(--app-min-font-min); }
+.theme-adv-group-label { font-size: var(--app-min-font-min); }
+.theme-adv-clear-btn { font-size: var(--app-min-font-min); }
+.cmp-header-action-btn { font-size: var(--app-min-font-min); }
+.cmp-eval-btn { font-size: var(--app-min-font-min); }
+.cmp-eval-group-label { font-size: var(--app-min-font-min); }
+.cmp-eval-item { font-size: var(--app-min-font-min); }
+.cmp-eval-empty { font-size: var(--app-min-font-min); }
+.cmp-eval-item-tick { font-size: var(--app-min-font-min); }
+.cmp-eval-expected { font-size: var(--app-min-font-min); }
+.cmp-eval-expected-label { font-size: var(--app-min-font-min); }
+.cmp-eval-expected-value { font-size: var(--app-min-font-min); }
+.pane-grade-badge { font-size: var(--app-min-font-min); }
+.compare-probe-status { font-size: var(--app-min-font-min); }
+.pane-vote-btn { font-size: var(--app-min-font-min); }
+.pane-title-btn { font-size: var(--app-min-font-min); }
+.pane-timer { font-size: var(--app-min-font-min); }
+.compare-mode-hint { font-size: var(--app-min-font-min); }
+#group-mode-btn { font-size: var(--app-min-font-min); }
+.control-label { font-size: var(--app-min-font-min); }
+#message { font-size: var(--app-min-font-min) !important; }
+.thumb { font-size: var(--app-min-font-min); }
+.attach-crop-btn { font-size: var(--app-min-font-min); }
+.thumb button { font-size: var(--app-min-font-min); }
+.agent-thread-elapsed { font-size: var(--app-min-font-min); }
+.stall-banner { font-size: var(--app-min-font-min); }
+.stall-banner-btn { font-size: var(--app-min-font-min); }
+.agent-image-progress-row { font-size: var(--app-min-font-min); }
+.stop-recording-btn { font-size: var(--app-min-font-min); }
+.preset-tab { font-size: var(--app-min-font-min); }
+.preset-templates-hint { font-size: var(--app-min-font-min); }
+.prompt-template-name { font-size: var(--app-min-font-min); }
+.prompt-template-preview { font-size: var(--app-min-font-min); }
+.preset-slider-row label { font-size: var(--app-min-font-min); }
+.preset-slider-value { font-size: var(--app-min-font-min); }
+.preset-temp-hints { font-size: var(--app-min-font-min); }
+.preset-clear-btn { font-size: var(--app-min-font-min); }
+.preset-hint-icon { font-size: var(--app-min-font-min); }
+.preset-section-header { font-size: var(--app-min-font-min); }
+.user-template-delete { font-size: var(--app-min-font-min); }
+.preset-save-template-btn { font-size: var(--app-min-font-min); }
+.char-expand-btn { font-size: var(--app-min-font-min); }
+.memory-char-chip { font-size: var(--app-min-font-min); }
+.char-template-select { font-size: var(--app-min-font-min); }
+.char-action-btn { font-size: var(--app-min-font-min); }
+.preset-toggle-row { font-size: var(--app-min-font-min); }
+.preset-sub-option { font-size: var(--app-min-font-min); }
+.preset-mem-choice { font-size: var(--app-min-font-min); }
+#memory-selected-count { font-size: var(--app-min-font-min); }
+.memory-count { font-size: var(--app-min-font-min); }
+.task-status-badge { font-size: var(--app-min-font-min); }
+.task-builtin-badge { font-size: var(--app-min-font-min); }
+.memory-cat-chip { font-size: var(--app-min-font-min); }
+.email-filter-group { font-size: var(--app-min-font-min); }
+.memory-cat-badge { font-size: var(--app-min-font-min); }
+.memory-item-source, .memory-item-time, .memory-item-uses { font-size: var(--app-min-font-min); }
+.doc-tab { font-size: var(--app-min-font-min); }
+.doc-tab-title-input { font-size: var(--app-min-font-min); }
+.doc-tab-lang { font-size: var(--app-min-font-min); }
+.doc-tab-new { font-size: var(--app-min-font-min); }
+.doc-tab-play { font-size: var(--app-min-font-min); }
+.doc-tab-version { font-size: var(--app-min-font-min); }
+.doc-version-badge { font-size: var(--app-min-font-min); }
+.doc-stream-indicator { font-size: var(--app-min-font-min); }
+.doc-actions-footer #doc-language-select { font-size: var(--app-min-font-min); }
+.doc-langpicker-trigger { font-size: var(--app-min-font-min); }
+.doc-langpicker-item { font-size: var(--app-min-font-min); }
+.doc-language-select { font-size: var(--app-min-font-min); }
+.doc-action-btn { font-size: var(--app-min-font-min); }
+.doc-overflow-item { font-size: var(--app-min-font-min); }
+.md-view-label { font-size: var(--app-min-font-min); }
+#doc-actions-footer #doc-footer-copy-btn[data-mode="reply"] { font-size: var(--app-min-font-min); }
+.doc-md-toolbar button { font-size: var(--app-min-font-min); }
+.md-dd-ico { font-size: var(--app-min-font-min); }
+.md-toolbar-overflow-item { font-size: var(--app-min-font-min); }
+.doc-find-input { font-size: var(--app-min-font-min); }
+.doc-find-count { font-size: var(--app-min-font-min); }
+.doc-line-numbers { font-size: var(--app-min-font-min); }
+.doc-editor-highlight { font-size: var(--app-min-font-min) !important; }
+.doc-font-m .doc-editor-textarea, .doc-font-m .doc-editor-highlight, .doc-font-m .doc-line-numbers { font-size: var(--app-min-font-min) !important; }
+.doc-editor-textarea { font-size: var(--app-min-font-min) !important; }
+.doc-selection-badge { font-size: var(--app-min-font-min); }
+.doc-selection-clear { font-size: var(--app-min-font-min); }
+.attach-card { font-size: var(--app-min-font-min); }
+.attach-card-size { font-size: var(--app-min-font-min); }
+.import-prompt-banner { font-size: var(--app-min-font-min); }
+.import-prompt-banner button { font-size: var(--app-min-font-min); }
+.doc-suggestion-card { font-size: var(--app-min-font-min); }
+.doc-suggestion-counter { font-size: var(--app-min-font-min); }
+.diff-toolbar { font-size: var(--app-min-font-min); }
+.diff-toolbar-status { font-size: var(--app-min-font-min); }
+.diff-chunk-btn { font-size: var(--app-min-font-min); }
+.doc-suggestion-accept-all { font-size: var(--app-min-font-min); }
+.doc-suggestion-reason { font-size: var(--app-min-font-min); }
+.doc-suggestion-diff { font-size: var(--app-min-font-min); }
+.doc-suggestion-accept, .doc-suggestion-dismiss { font-size: var(--app-min-font-min); }
+.doc-version-panel { font-size: var(--app-min-font-min); }
+.doc-version-header { font-size: var(--app-min-font-min); }
+.doc-version-num { font-size: var(--app-min-font-min); }
+.doc-version-source { font-size: var(--app-min-font-min); }
+.doc-version-time { font-size: var(--app-min-font-min); }
+.doc-version-summary { font-size: var(--app-min-font-min); }
+.doc-version-restore { font-size: var(--app-min-font-min); }
+.doc-version-latest { font-size: var(--app-min-font-min); }
+.doc-version-diff { font-size: var(--app-min-font-min); }
+.theme-opacity-label { font-size: var(--app-min-font-min); }
+.theme-autosaved-pill { font-size: var(--app-min-font-min); }
+.doc-md-preview { font-size: var(--app-min-font-min); }
+.admin-toggle-sub { font-size: var(--app-min-font-min); }
+.admin-priv-section { font-size: var(--app-min-font-min); }
+.priv-models-list label { font-size: var(--app-min-font-min); }
+.priv-models-all, .priv-models-none { font-size: var(--app-min-font-min); }
+.mcp-tools-panel .mcp-tools-header span:first-child { font-size: var(--app-min-font-min); }
+.mcp-tools-panel .mcp-tools-header a { font-size: var(--app-min-font-min); }
+.mcp-tools-list label { font-size: var(--app-min-font-min); }
+.adm-ep-section-head { font-size: var(--app-min-font-min); }
+.adm-quickstart-toggle { font-size: var(--app-min-font-min); }
+.adm-provider-btn { font-size: var(--app-min-font-min); }
+.adm-provider-item { font-size: var(--app-min-font-min); }
+.search-fb-chip { font-size: var(--app-min-font-min); }
+.search-fb-add { font-size: var(--app-min-font-min); }
+.mcp-tools-search { font-size: var(--app-min-font-min); }
+.mcp-tools-count { font-size: var(--app-min-font-min); }
+.admin-badge { font-size: var(--app-min-font-min); }
+.adm-ep-inline-msg { font-size: var(--app-min-font-min); }
+.admin-ep-detail { font-size: var(--app-min-font-min); }
+.admin-rag-item-meta { font-size: var(--app-min-font-min); }
+.admin-rag-status { font-size: var(--app-min-font-min); }
+#email-lib-modal .email-attachment-chip { font-size: var(--app-min-font-min) !important; }
+.doclib-card-ver { font-size: var(--app-min-font-min); }
+.doclib-card-lang { font-size: var(--app-min-font-min); }
+.doclib-card-session { font-size: var(--app-min-font-min); }
+.doclib-card-time { font-size: var(--app-min-font-min); }
+.skills-section-header { font-size: var(--app-min-font-min); }
+.skill-card-desc { font-size: var(--app-min-font-min); }
+.skill-stats { font-size: var(--app-min-font-min); }
+.skill-kebab-item { font-size: var(--app-min-font-min); }
+.skills-section-label { font-size: var(--app-min-font-min); }
+.skills-audit-title { font-size: var(--app-min-font-min); }
+.skills-audit-summary { font-size: var(--app-min-font-min); }
+.skill-test-task { font-size: var(--app-min-font-min); }
+.skill-eval-badge { font-size: var(--app-min-font-min); }
+.skill-eval-summary { font-size: var(--app-min-font-min); }
+.skill-eval-issues { font-size: var(--app-min-font-min); }
+.skill-rich-ph { font-size: var(--app-min-font-min); }
+.lib-loading-row { font-size: var(--app-min-font-min); }
+#doclib-selected-count { font-size: var(--app-min-font-min); }
+.archive-header { font-size: var(--app-min-font-min); }
+.gallery-search-enter-hint { font-size: var(--app-min-font-min); }
+.gallery-chip-clear { font-size: var(--app-min-font-min); }
+.attach-vision-model { font-size: var(--app-min-font-min); }
+.attach-image-name { font-size: var(--app-min-font-min); }
+.attach-ocr-btn { font-size: var(--app-min-font-min); }
+.vision-editor-title { font-size: var(--app-min-font-min); }
+.vision-editor-desc { font-size: var(--app-min-font-min); }
+.vision-editor-text { font-size: var(--app-min-font-min); }
+.vision-editor-btn { font-size: var(--app-min-font-min); }
+.attach-lightbox-err { font-size: var(--app-min-font-min); }
+.gallery-card-meta { font-size: var(--app-min-font-min); }
+.gallery-tag-enter-hint { font-size: var(--app-min-font-min); }
+.cookbook-serve-preset-meta { font-size: var(--app-min-font-min); }
+.hwfit-cached-item { font-size: var(--app-min-font-min); }
+.hwfit-cached-header { font-size: var(--app-min-font-min); }
+.hwfit-cached-repo { font-size: var(--app-min-font-min); }
+.hwfit-cached-size, .hwfit-cached-files { font-size: var(--app-min-font-min); }
+.hwfit-cached-delete { font-size: var(--app-min-font-min); }
+.hwfit-cached-badge { font-size: var(--app-min-font-min); }
+.hwfit-serve-row label { font-size: var(--app-min-font-min); }
+.hwfit-context-calc-btn { font-size: var(--app-min-font-min); }
+.hwfit-auto-ctx-note { font-size: var(--app-min-font-min); }
+.hwfit-ctx-control { font-size: var(--app-min-font-min); }
+.hwfit-sf { font-size: var(--app-min-font-min); }
+.hwfit-sf-cb { font-size: var(--app-min-font-min); }
+.hwfit-spec-group .hwfit-spec-method, .hwfit-spec-group .hwfit-spec-tokens { font-size: var(--app-min-font-min); }
+.hwfit-serve-extra label { font-size: var(--app-min-font-min); }
+.hwfit-serve-cmd-summary { font-size: var(--app-min-font-min); }
+.hwfit-serve-cmd { font-size: var(--app-min-font-min); }
+.hwfit-serve-actions .cookbook-btn { font-size: var(--app-min-font-min); }
+.hwfit-serve-cmd-title { font-size: var(--app-min-font-min); }
+.cookbook-task-session { font-size: var(--app-min-font-min); }
+.cookbook-task-server { font-size: var(--app-min-font-min); }
+.cookbook-task-uptime { font-size: var(--app-min-font-min); }
+.cookbook-task-status { font-size: var(--app-min-font-min); }
+.cookbook-body .memory-item-meta { font-size: var(--app-min-font-min) !important; }
+.cookbook-dl-repo, .hwfit-search { font-size: var(--app-min-font-min) !important; }
+.cookbook-task-sub { font-size: var(--app-min-font-min); }
+.cookbook-settings-hint { font-size: var(--app-min-font-min); }
+.hwfit-panel-hf-link { font-size: var(--app-min-font-min); }
+.cookbook-server-toggle { font-size: var(--app-min-font-min); }
+.cookbook-server-add { font-size: var(--app-min-font-min); }
+.cookbook-server-row input.hwfit-sf, .cookbook-server-row select.hwfit-sf { font-size: var(--app-min-font-min); }
+.cookbook-server-row > input.hwfit-sf, .cookbook-server-row > select.hwfit-sf, .cookbook-server-row > button, .cookbook-server-row .cookbook-srv-actions > button { font-size: var(--app-min-font-min); }
+.cookbook-server-rm { font-size: var(--app-min-font-min); }
+.cookbook-server-rm-btn { font-size: var(--app-min-font-min); }
+.cookbook-server-save-btn { font-size: var(--app-min-font-min); }
+.cookbook-server-cancel-btn { font-size: var(--app-min-font-min); }
+.hwfit-gpu-btn { font-size: var(--app-min-font-min); }
+.hwfit-gpu-group { font-size: var(--app-min-font-min); }
+.hwfit-toolbar select, .hwfit-toolbar input { font-size: var(--app-min-font-min); }
+.hwfit-toolbar .hwfit-usecase-btn { font-size: var(--app-min-font-min); }
+.hwfit-toolbar .hwfit-quant { font-size: var(--app-min-font-min); }
+.hwfit-toolbar .hwfit-engine { font-size: var(--app-min-font-min); }
+.hwfit-toolbar .hwfit-engine-btn { font-size: var(--app-min-font-min); }
+.hwfit-help-chip { font-size: var(--app-min-font-min); }
+.hwfit-engine-item, .hwfit-usecase-item { font-size: var(--app-min-font-min); }
+.hwfit-server-toggle { font-size: var(--app-min-font-min) !important; }
+.hwfit-hw-chip { font-size: var(--app-min-font-min); }
+.hwfit-manual-panel label { font-size: var(--app-min-font-min); }
+.hwfit-manual-panel select, .hwfit-manual-panel input, .hwfit-manual-panel button { font-size: var(--app-min-font-min); }
+.hwfit-loading { font-size: var(--app-min-font-min); }
+.hwfit-row { font-size: var(--app-min-font-min); }
+.hwfit-header .hwfit-col { font-size: var(--app-min-font-min); }
+.hwfit-header .hwfit-name { font-size: var(--app-min-font-min); }
+.hwfit-col { font-size: var(--app-min-font-min); }
+.hwfit-name { font-size: var(--app-min-font-min); }
+.hwfit-c-score { font-size: var(--app-min-font-min); }
+.hwfit-action-panel { font-size: var(--app-min-font-min); }
+.hwfit-panel-model { font-size: var(--app-min-font-min); }
+.hwfit-panel-badge { font-size: var(--app-min-font-min); }
+.hwfit-panel-fields label, .hwfit-adv-grid label { font-size: var(--app-min-font-min); }
+.hwfit-panel-fields input, .hwfit-panel-fields select, .hwfit-adv-grid input, .hwfit-adv-grid select { font-size: var(--app-min-font-min); }
+.hwfit-panel-advanced, .hwfit-panel-settings { font-size: var(--app-min-font-min); }
+.hwfit-panel-advanced summary, .hwfit-panel-settings summary { font-size: var(--app-min-font-min); }
+.hwfit-panel-cmd { font-size: var(--app-min-font-min); }
+.hwfit-panel-note { font-size: var(--app-min-font-min); }
+.hwfit-preset { font-size: var(--app-min-font-min); }
+.hwfit-preset-model { font-size: var(--app-min-font-min); }
+.hwfit-preset-backend { font-size: var(--app-min-font-min); }
+.shortcut-category { font-size: var(--app-min-font-min); }
+.shortcut-label { font-size: var(--app-min-font-min); }
+.shortcut-warn { font-size: var(--app-min-font-min); }
+.shortcut-hint { font-size: var(--app-min-font-min); }
+.shortcut-key-unset { font-size: var(--app-min-font-min); }
+.shortcut-unset { font-size: var(--app-min-font-min); }
+.shortcut-action-btn { font-size: var(--app-min-font-min); }
+.task-log-account-tag { font-size: var(--app-min-font-min); }
+.task-card .task-state-badge .task-state-label { font-size: var(--app-min-font-min); }
+.task-time-select, .task-date-select { font-size: var(--app-min-font-min); }
+.task-time-sep { font-size: var(--app-min-font-min); }
+.task-run-time { font-size: var(--app-min-font-min); }
+details.hwfit-serve-advanced > summary.hwfit-serve-advanced-summary { font-size: var(--app-min-font-min); }
+.sort-dropdown-item { font-size: var(--app-min-font-min) !important; }
+.hwfit-parser-tag { font-size: var(--app-min-font-min); }
+.hwfit-apply-opts { font-size: var(--app-min-font-min) !important; }
+.hwfit-opts-desc { font-size: var(--app-min-font-min); }
+.cookbook-tab-count { font-size: var(--app-min-font-min); }
+.research-synapse-compact .rs-meta { font-size: var(--app-min-font-min); }
+.research-synapse .rs-label { font-size: var(--app-min-font-min); }
+.research-synapse .rs-label-sub { font-size: var(--app-min-font-min); }
+.research-synapse .rs-meta { font-size: var(--app-min-font-min); }
+.gallery-album-count { font-size: var(--app-min-font-min); }
+.ge-alpha-tag { font-size: var(--app-min-font-min); }
+.gallery-editor-draft-meta { font-size: var(--app-min-font-min); }
+.ge-alpha-badge { font-size: var(--app-min-font-min); }
+.ge-diffusion-status { font-size: var(--app-min-font-min); }
+.ge-topbar-mask-color-label { font-size: var(--app-min-font-min); }
+.ge-tool-label { font-size: var(--app-min-font-min); }
+.ge-tool-ai { font-size: var(--app-min-font-min); }
+.ge-ai-command-toggle { font-size: var(--app-min-font-min); }
+.ge-ai-command-input { font-size: var(--app-min-font-min); }
+.ge-ai-command-suggestion-main { font-size: var(--app-min-font-min); }
+.ge-ai-command-suggestion-hint { font-size: var(--app-min-font-min); }
+.ge-ai-command-status { font-size: var(--app-min-font-min); }
+.ge-loading-overlay .ge-loading-text { font-size: var(--app-min-font-min); }
+#ge-shortcuts-overlay { font-size: var(--app-min-font-min); }
+.ge-shortcuts-head { font-size: var(--app-min-font-min); }
+.ge-shortcuts-col h5 { font-size: var(--app-min-font-min); }
+.ge-shortcuts-foot { font-size: var(--app-min-font-min); }
+.ge-merge-label { font-size: var(--app-min-font-min); }
+.ge-transform-field label { font-size: var(--app-min-font-min); }
+.ge-transform-popup-input { font-size: var(--app-min-font-min); }
+.ge-transform-popup-suffix { font-size: var(--app-min-font-min); }
+.ge-transform-popup-hint { font-size: var(--app-min-font-min); }
+.ge-inpaint-popup-input { font-size: var(--app-min-font-min); }
+.ge-inpaint-popup-run { font-size: var(--app-min-font-min); }
+.ge-control-row { font-size: var(--app-min-font-min); }
+.ge-size-label { font-size: var(--app-min-font-min); }
+.ge-eraser-row label > span[id$="-label"] { font-size: var(--app-min-font-min); }
+.ge-eraser-row > span[id$="-label"].ge-slider-value { font-size: var(--app-min-font-min); }
+.ge-tool-model-row > label { font-size: var(--app-min-font-min); }
+.ge-tool-model { font-size: var(--app-min-font-min); }
+.dropdown-section-label { font-size: var(--app-min-font-min); }
+.ge-slider-edit { font-size: var(--app-min-font-min); }
+.ge-merge-menu .dropdown-item-compact { font-size: var(--app-min-font-min); }
+.ge-section-help { font-size: var(--app-min-font-min); }
+.ge-section-title { font-size: var(--app-min-font-min); }
+.ge-inpaint-mask-label { font-size: var(--app-min-font-min); }
+.ge-eraser-row label { font-size: var(--app-min-font-min); }
+.ge-fx-popup { font-size: var(--app-min-font-min); }
+.ge-fx-popup-title { font-size: var(--app-min-font-min); }
+.ge-fx-group-title { font-size: var(--app-min-font-min); }
+.ge-fx-cb-tone { font-size: var(--app-min-font-min); }
+.ge-fx-row-label { font-size: var(--app-min-font-min); }
+.ge-fx-row-value { font-size: var(--app-min-font-min); }
+.ge-fx-menu-item { font-size: var(--app-min-font-min); }
+.ge-adj-popup { font-size: var(--app-min-font-min); }
+.ge-adj-title { font-size: var(--app-min-font-min); }
+.ge-fx-dock-chip { font-size: var(--app-min-font-min); }
+#ge-history-panel { font-size: var(--app-min-font-min); }
+.ge-history-title { font-size: var(--app-min-font-min); }
+.ge-history-row { font-size: var(--app-min-font-min); }
+.ge-history-row-time { font-size: var(--app-min-font-min); }
+.ge-canvas-loading-msg { font-size: var(--app-min-font-min); }
+.ge-dep-notice { font-size: var(--app-min-font-min); }
+.ge-dep-notice-text code { font-size: var(--app-min-font-min); }
+.ge-adj-foot .ge-adj-cancel-btn, .ge-adj-foot .ge-adj-apply-btn { font-size: var(--app-min-font-min) !important; }
+.ge-adj-row > label { font-size: var(--app-min-font-min); }
+.ge-adj-value { font-size: var(--app-min-font-min); }
+.ge-adj-cb-tone { font-size: var(--app-min-font-min); }
+.ge-adj-cb-tone-select { font-size: var(--app-min-font-min); }
+.ge-adj-hist-details > summary { font-size: var(--app-min-font-min); }
+.ge-btn { font-size: var(--app-min-font-min); }
+.ge-btn-sm { font-size: var(--app-min-font-min); }
+.ge-inpaint-mode-btn { font-size: var(--app-min-font-min); }
+.ge-wand-mode-btn { font-size: var(--app-min-font-min); }
+.ge-wand-live-btn { font-size: var(--app-min-font-min); }
+.ge-filter-submenu-label { font-size: var(--app-min-font-min); }
+.ge-filter-modal-head { font-size: var(--app-min-font-min); }
+.ge-filter-row label { font-size: var(--app-min-font-min); }
+.ge-edge-label { font-size: var(--app-min-font-min); }
+.ge-edge-input { font-size: var(--app-min-font-min); }
+.ge-edge-hint { font-size: var(--app-min-font-min); }
+.ge-canvas-prompt-field > span { font-size: var(--app-min-font-min); }
+.ge-canvas-prompt-hint { font-size: var(--app-min-font-min); }
+.ge-zoom-label { font-size: var(--app-min-font-min); }
+.ge-slider-bubble { font-size: var(--app-min-font-min); }
+.ge-layers-header { font-size: var(--app-min-font-min); }
+.ge-layers-actions .ge-btn { font-size: var(--app-min-font-min); }
+.ge-layer-item { font-size: var(--app-min-font-min); }
+.ge-layer-name-input { font-size: var(--app-min-font-min); }
+.ge-layer-btn { font-size: var(--app-min-font-min); }
+.ge-crop-apply input[type="number"] { font-size: var(--app-min-font-min); }
+.ge-crop-apply-btn { font-size: var(--app-min-font-min); }
+.ge-inpaint-model-row label { font-size: var(--app-min-font-min); }
+.ge-inpaint-model-row #ge-ai-inpaint { font-size: var(--app-min-font-min); }
+.ge-inpaint-prompt { font-size: var(--app-min-font-min); }
+.ge-transform-popup-body #ge-transform-cancel-btn, .ge-transform-popup-body #ge-transform-apply { font-size: var(--app-min-font-min) !important; }
+.ge-topbar .ge-btn, .ge-topbar .ge-btn-sm { font-size: var(--app-min-font-min) !important; }
+.ge-topbar select, .ge-topbar input, .ge-topbar .ge-ai-model { font-size: var(--app-min-font-min) !important; }
+.ge-topbar .ge-canvas-size { font-size: var(--app-min-font-min) !important; }
+.email-reader-header > .email-reader-meta { font-size: var(--app-min-font-min); }
+.recipient-chip { font-size: var(--app-min-font-min); }
+.recipient-chip-popover { font-size: var(--app-min-font-min); }
+.email-inline-image-sub { font-size: var(--app-min-font-min); }
+.email-fold-summary-meta { font-size: var(--app-min-font-min); }
+.schedule-send-label { font-size: var(--app-min-font-min); }
+.schedule-send-datetime { font-size: var(--app-min-font-min); }
+.emoji-picker-search { font-size: var(--app-min-font-min); }
+.emoji-picker-group-name { font-size: var(--app-min-font-min); }
+.email-attachment-chip { font-size: var(--app-min-font-min); }
+.email-attachment-chip .att-size { font-size: var(--app-min-font-min); }
+.email-odysseus-attach-meta { font-size: var(--app-min-font-min); }
+.email-odysseus-attach-count { font-size: var(--app-min-font-min); }
+.contact-suggestion { font-size: var(--app-min-font-min); }
+.contact-suggestion .contact-email { font-size: var(--app-min-font-min); }
+.email-settings-status, .email-style-settings-status { font-size: var(--app-min-font-min); }
+.note-fullscreen-actions .note-form-text-btn { font-size: var(--app-min-font-min); }
+.note-fullscreen-overlay .note-form-actions-group .note-form-label { font-size: var(--app-min-font-min); }
+.notes-new-btn { font-size: var(--app-min-font-min); }
+.notes-header-btn-label { font-size: var(--app-min-font-min); }
+.note-corner-menu-dropdown { font-size: var(--app-min-font-min); }
+.note-corner-menu-dropdown .ncm-item { font-size: var(--app-min-font-min); }
+.note-card-ai-chip { font-size: var(--app-min-font-min); }
+.note-agent-menu { font-size: var(--app-min-font-min); }
+.notes-quick-input { font-size: var(--app-min-font-min); }
+.notes-empty-msg { font-size: var(--app-min-font-min); }
+.note-reminder-tag { font-size: var(--app-min-font-min); }
+.note-card-reminder { font-size: var(--app-min-font-min); }
+.note-reminder-menu { font-size: var(--app-min-font-min); }
+.note-reminder-menu-title { font-size: var(--app-min-font-min); }
+.note-reminder-menu-item { font-size: var(--app-min-font-min); }
+.note-reminder-menu-sub { font-size: var(--app-min-font-min); }
+.note-reminder-menu-check { font-size: var(--app-min-font-min); }
+.note-reminder-date-input { font-size: var(--app-min-font-min); }
+.note-reminder-menu-back { font-size: var(--app-min-font-min); }
+.note-reminder-menu-sublabel { font-size: var(--app-min-font-min); }
+.note-reminder-day-chip { font-size: var(--app-min-font-min); }
+.note-form-type-pill { font-size: var(--app-min-font-min); }
+.note-card-label-chip { font-size: var(--app-min-font-min); }
+.notes-select-trigger { font-size: var(--app-min-font-min); }
+.notes-label-chip { font-size: var(--app-min-font-min); }
+.notes-label-chip-count { font-size: var(--app-min-font-min); }
+.note-goal-pill { font-size: var(--app-min-font-min); }
+.note-goal-desc { font-size: var(--app-min-font-min); }
+.note-form-goal-desc { font-size: var(--app-min-font-min); }
+.note-form-goal-ai { font-size: var(--app-min-font-min); }
+.note-form-goal-hint { font-size: var(--app-min-font-min); }
+.notes-today-header { font-size: var(--app-min-font-min); }
+.notes-today-title { font-size: var(--app-min-font-min); }
+.notes-today-progress { font-size: var(--app-min-font-min); }
+.notes-empty { font-size: var(--app-min-font-min); }
+.notes-bulk-info { font-size: var(--app-min-font-min); }
+.note-form-label { font-size: var(--app-min-font-min); }
+.note-card-title { font-size: var(--app-min-font-min); }
+.note-content-preview { font-size: var(--app-min-font-min); }
+.note-due-inline { font-size: var(--app-min-font-min); }
+.note-cl-quickadd-input { font-size: var(--app-min-font-min); }
+.note-checkbox { font-size: var(--app-min-font-min); }
+.note-due-badge { font-size: var(--app-min-font-min); }
+.note-type-btn { font-size: var(--app-min-font-min); }
+.note-form-content { font-size: var(--app-min-font-min); }
+.note-form-text-btn { font-size: var(--app-min-font-min); }
+.note-form-draw-text.size-s { font-size: var(--app-min-font-min); }
+.note-form-due { font-size: var(--app-min-font-min); }
+.note-form-save, .note-form-cancel, .note-form-archive { font-size: var(--app-min-font-min); }
+.note-cl-text { font-size: var(--app-min-font-min); }
+.note-cl-add { font-size: var(--app-min-font-min); }
+.cal-quickadd-hint { font-size: var(--app-min-font-min); }
+.cal-quickadd-status { font-size: var(--app-min-font-min); }
+#cookbook-server-add.cal-add-btn-text { font-size: var(--app-min-font-min); }
+.reader-btn-label { font-size: var(--app-min-font-min); }
+.email-account-unread-count { font-size: var(--app-min-font-min); }
+.email-accounts-loading-label { font-size: var(--app-min-font-min); }
+.date-section-header { font-size: var(--app-min-font-min); }
+#email-lib-modal .email-lib-sync-status { font-size: var(--app-min-font-min); }
+.cal-day-num { font-size: var(--app-min-font-min); }
+.cal-event-row-time { font-size: var(--app-min-font-min); }
+.cal-event-time { font-size: var(--app-min-font-min); }
+.cal-wk-rail-cell { font-size: var(--app-min-font-min); }
+.cal-wk-col-head { font-size: var(--app-min-font-min); }
+.cal-wk-block { font-size: var(--app-min-font-min); }
+.cal-wk-block-name { font-size: var(--app-min-font-min); }
+.cal-wk-ghost { font-size: var(--app-min-font-min); }
+.cal-day-search-meta { font-size: var(--app-min-font-min); }
+.cal-search-count { font-size: var(--app-min-font-min); }
+.cal-agenda-today-badge { font-size: var(--app-min-font-min); }
+.assistant-field { font-size: var(--app-min-font-min); }
+.assistant-field > span { font-size: var(--app-min-font-min); }
+.assistant-field input[type="text"], .assistant-field input[type="time"], .assistant-field select, .assistant-field textarea { font-size: var(--app-min-font-min); }
+.assistant-checkins h5 { font-size: var(--app-min-font-min); }
+.assistant-checkin-head input[type="text"], .assistant-checkin-head input[type="time"] { font-size: var(--app-min-font-min); }
+.assistant-checkin-run { font-size: var(--app-min-font-min); }
+.assistant-checkin-prompt { font-size: var(--app-min-font-min); }
+.assistant-checkin-meta { font-size: var(--app-min-font-min); }
+.assistant-tool-group-label { font-size: var(--app-min-font-min); }
+.assistant-tool-item { font-size: var(--app-min-font-min); }
+.research-cat-badge { font-size: var(--app-min-font-min); }
+.research-job-time, .research-job-meta { font-size: var(--app-min-font-min); }
+.research-job-status { font-size: var(--app-min-font-min); }
+.research-job-queued-meta { font-size: var(--app-min-font-min); }
+.research-section-count { font-size: var(--app-min-font-min); }
+.research-lib-meta { font-size: var(--app-min-font-min); }
+.cp-popover { font-size: var(--app-min-font-min); }
+.cp-hex { font-size: var(--app-min-font-min); }
+.cp-section-label { font-size: var(--app-min-font-min); }
+.cp-recent-empty { font-size: var(--app-min-font-min); }
+.slash-autocomplete-popup { font-size: var(--app-min-font-min); }
+.slash-ac-cat { font-size: var(--app-min-font-min); }
+.slash-ac-usage { font-size: var(--app-min-font-min); }
+.adm-copilot-wait { font-size: var(--app-min-font-min); }
+.adm-copilot-code-label { font-size: var(--app-min-font-min); }
+.adm-copilot-auth { font-size: var(--app-min-font-min); }
+.adm-copilot-hint { font-size: var(--app-min-font-min); }
+.hwfit-schedule-title { font-size: var(--app-min-font-min); }
+.hwfit-schedule-field { font-size: var(--app-min-font-min); }
+.hwfit-schedule-label { font-size: var(--app-min-font-min); }
+.hwfit-sched-day-chip { font-size: var(--app-min-font-min); }
+.hwfit-schedule-mirror-toggle { font-size: var(--app-min-font-min); }
+.hwfit-sched-err { font-size: var(--app-min-font-min); }
+.ask-user-question { font-size: var(--app-min-font-min) !important; }
+.ask-user-option { font-size: var(--app-min-font-min) !important; }
+.ask-user-option-label { font-size: var(--app-min-font-min) !important; }
+.ask-user-option-desc { font-size: var(--app-min-font-min) !important; }
+.workspace-cur { font-size: var(--app-min-font-min); }
+.workspace-row { font-size: var(--app-min-font-min); }
+.workspace-empty { font-size: var(--app-min-font-min); }
+.workspace-note { font-size: var(--app-min-font-min); }
+#log-console-container { font-size: var(--app-min-font-min); }
+.log-line { font-size: var(--app-min-font-min); }
