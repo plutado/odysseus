@@ -360,7 +360,7 @@ class ToolIndex:
                    "check on that job", "job output", "kill the job",
                    "kill the background", "stop the background", "running job"}):
             {"manage_bg_jobs"},
-        frozenset({"note", "todo", "reminder", "remind", "checklist", "remember to"}):
+        frozenset({"note", "todo", "to-do", "to do", "reminder", "remind", "checklist", "remember to"}):
             {"manage_notes"},
         # Chat/session management. "rename" alone maps to documents below, so a
         # request like "rename the last 12 sessions/chats" needs these session
