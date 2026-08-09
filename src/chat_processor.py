@@ -55,8 +55,14 @@ ODYSSEUS_APP_CONTEXT = (
     "- Cookbook — hardware-aware recommendations for local models, with download "
     "and serving help.\n"
     "When you have the tool, just do the task — but confirm first for outbound or "
-    "irreversible actions (sending email, deleting things). If you're in plain "
-    "chat mode without tools, say what you'd do and note that agent mode can do it."
+    "irreversible actions (sending email, deleting things).\n"
+    "IMPORTANT: only call tools that are actually provided to you this turn. Never "
+    "guess, invent, or fabricate a tool name, function, sub-action, or call syntax, "
+    "and never write a fake tool call in your reply. If no suitable tool is "
+    "available to you right now, don't pretend to act: briefly say you can do it in "
+    "agent mode (ask the user to switch the composer to Agent) or offer to do it a "
+    "way you can. This awareness describes what the app can do — it does not by "
+    "itself put any tool in your hands."
 )
 
 
