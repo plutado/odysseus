@@ -7,7 +7,7 @@
 //   - Other static assets (images/fonts/libs): cache-first with bg refresh.
 //   - API / non-GET: never cached.
 // Bump CACHE_NAME whenever the precache list or SW logic changes.
-const CACHE_NAME = 'odysseus-v403-nf-shell';
+const CACHE_NAME = 'odysseus-v404-app-chrome-16px';
 
 // Core shell precached on install so repeat opens are instant without any
 // network wait. Keep this list in sync with the <script type="module"> tags
@@ -94,10 +94,10 @@ self.addEventListener('fetch', (e) => {
   // Never touch API calls or non-GET.
   if (url.pathname.startsWith('/api/') || e.request.method !== 'GET') return;
 
-  // HTML navigation: stale-while-revalidate the app shell — but ONLY for the
-  // SPA root. Other navigations (e.g. a deep-linked /static/*.html page) must
-  // go to the network/static handlers below; otherwise every navigation was
-  // served the app index, replacing the page the user actually asked for.
+  // HTML navigation: handle the app shell here — but ONLY for the SPA root.
+  // Other navigations (e.g. a deep-linked /static/*.html page) must go to the
+  // network/static handlers below; otherwise every navigation was served the
+  // app index, replacing the page the user actually asked for.
   if (e.request.mode === 'navigate' && url.pathname === '/') {
     // Network-first for the app shell: always try to fetch the freshest index
     // (so CSS/JS ?v= bumps show up on ONE reload), fall back to cache offline.

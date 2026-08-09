@@ -41143,12 +41143,13 @@ body.theme-frosted .modal {
 }
 
 /* Left-sidebar navigation items + section headers — explicit desktop size for
-   readability. (These otherwise inherit the small root size.) */
+   readability. (These otherwise inherit the small root size.) Uses the shared
+   --app-min-font floor (16px) so the nav matches the rest of the app. */
 .sidebar .list-item,
 .sidebar .list-item .grow,
 .sidebar .section-title,
 .sidebar .section-title-label {
-  font-size: 14px !important;
+  font-size: var(--app-min-font) !important;
 }
 
 /* Fork customization: auto-load email inline images by default. The per-image
@@ -41211,3 +41212,16 @@ body.theme-frosted .modal {
 }
 /* Per-card #hashtag chips: readable but compact (secondary metadata). */
 .notes-pane .note-card-label-chip { font-size: 14px; }
+
+/* App chrome — the shared 16px floor across the main interface, not just panels:
+   the composer, model/mode controls, the welcome-screen sub-copy, and the
+   sidebar user name. (Left-sidebar nav items use the same variable via the
+   ".sidebar .list-item" rule elsewhere in this file.) */
+.chat-input-bar textarea#message { font-size: var(--app-min-font) !important; }
+#model-picker-label,
+.model-picker-btn,
+.mode-toggle-btn,
+.user-bar-name,
+#welcome-screen .welcome-sub {
+  font-size: var(--app-min-font);
+}
