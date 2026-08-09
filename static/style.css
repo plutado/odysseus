@@ -41225,3 +41225,406 @@ body.theme-frosted .modal {
 #welcome-screen .welcome-sub {
   font-size: var(--app-min-font);
 }
+
+/* ── Fork: tool-modal readable-text 16px floor (399 selectors; auto-generated,
+   micro badges/dots/meta/timestamps, the Cookbook data table, calendar grid, and
+   user-controlled email-body font deliberately left at their sizes). ── */
+.footer-open-gallery-btn { font-size: var(--app-min-font); }
+.doclib-card-action-btn { font-size: var(--app-min-font); }
+.modal-content { font-size: var(--app-min-font); }
+.compare-probe-title { font-size: var(--app-min-font); }
+.compare-probe-row { font-size: var(--app-min-font); }
+.compare-probe-action-btn { font-size: var(--app-min-font); }
+.compare-section-label { font-size: var(--app-min-font); }
+.compare-toggle-label { font-size: var(--app-min-font); }
+#group-mode-btn .compare-toggle-label { font-size: var(--app-min-font); }
+.compare-header-bar #compare-check-btn > span, .compare-header-bar #compare-add-btn > span { font-size: var(--app-min-font); }
+.memory-scope-btn { font-size: var(--app-min-font) !important; }
+.memory-modal-content { font-size: var(--app-min-font); }
+.memory-tab { font-size: var(--app-min-font); }
+.memory-desc { font-size: var(--app-min-font); }
+.memory-add-input { font-size: var(--app-min-font); }
+.memory-toolbar-btn { font-size: var(--app-min-font); }
+.memory-toolbar-toggle { font-size: var(--app-min-font); }
+.memory-bulk-bar { font-size: var(--app-min-font); }
+.memory-sort-btn { font-size: var(--app-min-font); }
+.memory-sort-item { font-size: var(--app-min-font); }
+.admin-toggle-state { font-size: var(--app-min-font); }
+.memory-bulk-check-all { font-size: var(--app-min-font); }
+.memory-search-input { font-size: var(--app-min-font); }
+.memory-item-title { font-size: var(--app-min-font); }
+.memory-item-text { font-size: var(--app-min-font); }
+.memory-item-edit-input { font-size: var(--app-min-font); }
+.memory-edit-cat-select { font-size: var(--app-min-font); }
+.memory-item-dropdown .dropdown-item-compact { font-size: var(--app-min-font); }
+.memory-item-btn { font-size: var(--app-min-font); }
+.doclib-research-section-label { font-size: var(--app-min-font); }
+.doclib-research-sources ol { font-size: var(--app-min-font); }
+.doclib-research-summary { font-size: var(--app-min-font); }
+.memory-sort-select { font-size: var(--app-min-font); }
+.email-filter-btn { font-size: var(--app-min-font); }
+.email-filter-item { font-size: var(--app-min-font); }
+.memory-empty { font-size: var(--app-min-font); }
+.memory-suggestions-header { font-size: var(--app-min-font); }
+.email-more-menu .dropdown-item-compact { font-size: var(--app-min-font); }
+.admin-card h2 { font-size: var(--app-min-font); }
+.admin-toggle-label { font-size: var(--app-min-font); }
+.admin-user-name { font-size: var(--app-min-font); }
+.admin-btn-delete { font-size: var(--app-min-font); }
+.admin-btn-add { font-size: var(--app-min-font); }
+.admin-btn-sm { font-size: var(--app-min-font); }
+.admin-add-form input { font-size: var(--app-min-font); }
+.admin-switch-inline { font-size: var(--app-min-font); }
+.admin-model-form input, .admin-model-form select { font-size: var(--app-min-font); }
+.admin-ep-item { font-size: var(--app-min-font); }
+.admin-error { font-size: var(--app-min-font); }
+.admin-success { font-size: var(--app-min-font); }
+.admin-empty { font-size: var(--app-min-font); }
+.admin-rag-upload-zone p { font-size: var(--app-min-font); }
+.admin-rag-dir-row input { font-size: var(--app-min-font); }
+.admin-rag-dir-row button { font-size: var(--app-min-font); }
+.admin-rag-section-label { font-size: var(--app-min-font); }
+.admin-rag-item { font-size: var(--app-min-font); }
+.admin-rag-item .admin-btn-delete { font-size: var(--app-min-font); }
+.admin-card select { font-size: var(--app-min-font); }
+.admin-card input { font-size: var(--app-min-font); }
+.admin-card label { font-size: var(--app-min-font); }
+.doclib-modal-content { font-size: var(--app-min-font); }
+.email-reader-tab-modal .modal-header h4 { font-size: var(--app-min-font); }
+.doclib-stats { font-size: var(--app-min-font); }
+.doclib-search { font-size: var(--app-min-font); }
+.doclib-sort { font-size: var(--app-min-font); }
+.doclib-chip { font-size: var(--app-min-font); }
+#email-lib-modal .email-lib-fab { font-size: var(--app-min-font); }
+#archive-chips .doclib-chip { font-size: var(--app-min-font); }
+#doclib-panel-chats .memory-sort-select, #doclib-panel-archive .memory-sort-select, #doclib-panel-research .memory-sort-select, [data-doclib-panel="documents"] .memory-sort-select { font-size: var(--app-min-font); }
+#doclib-panel-chats .memory-toolbar-btn, #doclib-panel-archive .memory-toolbar-btn, #doclib-panel-research .memory-toolbar-btn, [data-doclib-panel="documents"] .memory-toolbar-btn { font-size: var(--app-min-font); }
+#doclib-panel-chats .memory-search-input, #doclib-panel-archive .memory-search-input { font-size: var(--app-min-font); }
+#doclib-panel-chats .memory-search-input, #doclib-panel-archive .memory-search-input, #doclib-panel-research .memory-search-input, [data-doclib-panel="documents"] .memory-search-input, #memory-modal .memory-search-input, #tasks-modal .memory-search-input { font-size: var(--app-min-font); }
+#doclib-panel-chats .doclib-chip, #doclib-panel-archive .doclib-chip { font-size: var(--app-min-font); }
+#email-lib-modal .doclib-card-expanded .email-card-titlerow .memory-item-title { font-size: var(--app-min-font); }
+.doclib-card-title { font-size: var(--app-min-font); }
+.doclib-card-expanded-actions > .doclib-card-action-btn { font-size: var(--app-min-font); }
+.doclib-chat-preview { font-size: var(--app-min-font); }
+.doclib-chat-preview .doclib-chat-open-btn { font-size: var(--app-min-font); }
+.doclib-chat-delete-btn, .doclib-chat-archive-btn, .doclib-chat-restore-btn, .doclib-chat-discuss-btn, .doclib-chat-copy-btn { font-size: var(--app-min-font); }
+.doclib-chat-preview-messages .doclib-chat-msg-role { font-size: var(--app-min-font); }
+.doclib-chat-bubble { font-size: var(--app-min-font); }
+.doclib-chat-msg-model { font-size: var(--app-min-font); }
+.doclib-chat-bubble-body pre { font-size: var(--app-min-font); }
+.doclib-chat-bubble-body code { font-size: var(--app-min-font); }
+.doclib-empty { font-size: var(--app-min-font); }
+.doclib-load-more { font-size: var(--app-min-font); }
+.doclib-toolbar-btn { font-size: var(--app-min-font); }
+.doclib-bulk-bar { font-size: var(--app-min-font); }
+.doclib-bulk-check-all { font-size: var(--app-min-font); }
+.gallery-modal-content { font-size: var(--app-min-font); }
+.gallery-stats { font-size: var(--app-min-font); }
+.gallery-search { font-size: var(--app-min-font); }
+#gallery-select-btn { font-size: var(--app-min-font); }
+.gallery-model-filter, .gallery-sort { font-size: var(--app-min-font); }
+.gallery-chip { font-size: var(--app-min-font); }
+.gallery-chip-add { font-size: var(--app-min-font); }
+.gallery-fav-btn { font-size: var(--app-min-font); }
+.gallery-ai-chip { font-size: var(--app-min-font); }
+.gallery-card-upload-label { font-size: var(--app-min-font); }
+.gallery-select-btn { font-size: var(--app-min-font); }
+.gallery-bulk-bar { font-size: var(--app-min-font); }
+.gallery-bulk-all { font-size: var(--app-min-font); }
+.gallery-bulk-delete { font-size: var(--app-min-font); }
+.gallery-bulk-cancel { font-size: var(--app-min-font); }
+.gallery-card-prompt { font-size: var(--app-min-font); }
+.gallery-empty { font-size: var(--app-min-font); }
+.gallery-load-more { font-size: var(--app-min-font); }
+.gallery-detail-back { font-size: var(--app-min-font); }
+.gallery-detail-action { font-size: var(--app-min-font); }
+.gallery-detail-menu .dropdown-item-compact { font-size: var(--app-min-font); }
+.gallery-date-rel { font-size: var(--app-min-font); }
+.gallery-detail-section label { font-size: var(--app-min-font); }
+.gallery-detail-section div { font-size: var(--app-min-font); }
+.gallery-tag-input, .gallery-detail-name-input { font-size: var(--app-min-font); }
+.gallery-detail-name-input { font-size: var(--app-min-font); }
+.gallery-tag-save { font-size: var(--app-min-font); }
+.cookbook-serve-preset-name { font-size: var(--app-min-font); }
+.cookbook-serve-preset-launch { font-size: var(--app-min-font); }
+.cookbook-serve-preset-rm { font-size: var(--app-min-font); }
+.cookbook-card-title { font-size: var(--app-min-font); }
+.cookbook-card-desc { font-size: var(--app-min-font); }
+.cookbook-field-label { font-size: var(--app-min-font); }
+.cookbook-field-input { font-size: var(--app-min-font); }
+.cookbook-cmd-preview { font-size: var(--app-min-font); }
+.cookbook-btn { font-size: var(--app-min-font); }
+.cookbook-output-pre { font-size: var(--app-min-font); }
+.cookbook-clear-btn { font-size: var(--app-min-font) !important; }
+.cookbook-bulk-bar { font-size: var(--app-min-font); }
+.cookbook-serve-dir-pill { font-size: var(--app-min-font); }
+.cookbook-serve-running-pill, .cookbook-serve-downloading-pill { font-size: var(--app-min-font); }
+.cookbook-serve-dir-edit { font-size: var(--app-min-font); }
+.cookbook-gpu-btn { font-size: var(--app-min-font); }
+.cookbook-gpu-popup { font-size: var(--app-min-font); }
+.cookbook-gpu-popup-stats { font-size: var(--app-min-font); }
+.cookbook-gpu-popup-close { font-size: var(--app-min-font); }
+.cookbook-gpu-kill { font-size: var(--app-min-font); }
+.cookbook-hf-link { font-size: var(--app-min-font); }
+.cookbook-stop-all-btn { font-size: var(--app-min-font) !important; }
+.cookbook-saved-toggle-header { font-size: var(--app-min-font); }
+.cookbook-saved-item { font-size: var(--app-min-font); }
+.cookbook-saved-host { font-size: var(--app-min-font); }
+.cookbook-saved-launch { font-size: var(--app-min-font); }
+.cookbook-saved-del { font-size: var(--app-min-font); }
+.cookbook-slot-btn { font-size: var(--app-min-font); }
+.cookbook-slot-del { font-size: var(--app-min-font); }
+.cookbook-dep-section-title { font-size: var(--app-min-font); }
+.cookbook-dep-section-note { font-size: var(--app-min-font); }
+.cookbook-dep-tag { font-size: var(--app-min-font); }
+.cookbook-dep-installed-btn .cookbook-dep-caret { font-size: var(--app-min-font); }
+.cookbook-task-dropdown .dropdown-item-compact { font-size: var(--app-min-font); }
+.cookbook-edit-title { font-size: var(--app-min-font); }
+.cookbook-edit-textarea { font-size: var(--app-min-font); }
+.cookbook-task-header { font-size: var(--app-min-font); }
+.cookbook-task-type { font-size: var(--app-min-font); }
+.cookbook-task-wave { font-size: var(--app-min-font); }
+.cookbook-task-done-label, .cookbook-task-clear-label { font-size: var(--app-min-font); }
+.cookbook-task-start-now { font-size: var(--app-min-font); }
+.cookbook-task-serve-btn { font-size: var(--app-min-font); }
+.cookbook-tab { font-size: var(--app-min-font); }
+.cookbook-body { font-size: var(--app-min-font); }
+.cookbook-body h2 { font-size: var(--app-min-font); }
+.cookbook-body .memory-desc, .cookbook-body .doclib-desc { font-size: var(--app-min-font); }
+.cookbook-body .memory-item-title { font-size: var(--app-min-font); }
+.cookbook-body .memory-toolbar-btn { font-size: var(--app-min-font); }
+select.cookbook-field-input { font-size: var(--app-min-font) !important; }
+.cookbook-task-name { font-size: var(--app-min-font); }
+.cookbook-section-title { font-size: var(--app-min-font); }
+.cookbook-settings-label { font-size: var(--app-min-font); }
+.cookbook-dl-btn { font-size: var(--app-min-font); }
+.cookbook-saved-name { font-size: var(--app-min-font); }
+.cookbook-saved-save, .cookbook-saved-arrow { font-size: var(--app-min-font); }
+.cookbook-checkbox-label { font-size: var(--app-min-font); }
+.cookbook-slider-value { font-size: var(--app-min-font); }
+.cookbook-gpu-label { font-size: var(--app-min-font); }
+.cookbook-add-instance-btn, .cookbook-save-btn { font-size: var(--app-min-font); }
+.cookbook-remove-instance-btn { font-size: var(--app-min-font); }
+.cookbook-saved-card .cookbook-card-desc { font-size: var(--app-min-font); }
+.cookbook-delete-preset-btn { font-size: var(--app-min-font); }
+.cookbook-diag-fold { font-size: var(--app-min-font); }
+.cookbook-diag-chevron { font-size: var(--app-min-font); }
+.cookbook-diag-dismiss { font-size: var(--app-min-font); }
+.cookbook-diag-message { font-size: var(--app-min-font); }
+.cookbook-diag-suggestion { font-size: var(--app-min-font); }
+.cookbook-diag-action-trigger { font-size: var(--app-min-font); }
+.cookbook-diag-btn { font-size: var(--app-min-font); }
+.cookbook-dl-repo { font-size: var(--app-min-font); }
+.cookbook-dl-gguf-row { font-size: var(--app-min-font); }
+.cookbook-settings-input { font-size: var(--app-min-font); }
+.cookbook-settings-subtitle { font-size: var(--app-min-font); }
+.cookbook-srv-color-item { font-size: var(--app-min-font); }
+.cookbook-path-add { font-size: var(--app-min-font); }
+.settings-sidebar-label { font-size: var(--app-min-font); }
+.settings-nav-item { font-size: var(--app-min-font); }
+.tasks-modal-content { font-size: var(--app-min-font); }
+.task-completed-preview-head { font-size: var(--app-min-font); }
+.task-log-row-head { font-size: var(--app-min-font); }
+.task-log-failed-tag { font-size: var(--app-min-font); }
+.task-log-repeat { font-size: var(--app-min-font); }
+.task-log-running { font-size: var(--app-min-font); }
+.task-log-running-inline { font-size: var(--app-min-font); }
+.task-log-force-run { font-size: var(--app-min-font); }
+.task-log-row.is-skipped { font-size: var(--app-min-font); }
+.task-log-row-body { font-size: var(--app-min-font); }
+.task-log-row-body pre { font-size: var(--app-min-font); }
+.task-log-row-body code { font-size: var(--app-min-font); }
+.task-log-row-body h1 { font-size: var(--app-min-font); }
+.task-log-row-body h2 { font-size: var(--app-min-font); }
+.task-log-row-body h3, .task-log-row-body h4 { font-size: var(--app-min-font); }
+.task-log-row-body table { font-size: var(--app-min-font); }
+.task-log-open-chat, .task-log-open-report, .task-log-copy, .task-log-clear-cache, .task-log-run-again { font-size: var(--app-min-font); }
+.tasks-af-chip { font-size: var(--app-min-font); }
+.task-log-row-toggle { font-size: var(--app-min-font); }
+.task-log-prompt { font-size: var(--app-min-font); }
+.task-log-prompt pre { font-size: var(--app-min-font); }
+.task-card-delete-busy { font-size: var(--app-min-font); }
+.task-dropdown button { font-size: var(--app-min-font) !important; }
+.task-card-name { font-size: var(--app-min-font); }
+.task-card-output { font-size: var(--app-min-font); }
+.task-card-prompt { font-size: var(--app-min-font); }
+.task-btn { font-size: var(--app-min-font); }
+.tasks-clock { font-size: var(--app-min-font); }
+.task-preset-label { font-size: var(--app-min-font); }
+.task-preset-desc { font-size: var(--app-min-font); }
+.task-form-label { font-size: var(--app-min-font); }
+.task-form-input { font-size: var(--app-min-font); }
+.task-form-notif-copy { font-size: var(--app-min-font); }
+.task-form-notif-copy span:last-child { font-size: var(--app-min-font); }
+.task-toggle-btn { font-size: var(--app-min-font); }
+.task-run-item-header { font-size: var(--app-min-font); }
+.task-run-result { font-size: var(--app-min-font); }
+.settings-label { font-size: var(--app-min-font); }
+.settings-select { font-size: var(--app-min-font); }
+.settings-fallback-num { font-size: var(--app-min-font); }
+.settings-fallback-add { font-size: var(--app-min-font); }
+.settings-input { font-size: var(--app-min-font); }
+.admin-tool-cat-header { font-size: var(--app-min-font); }
+.admin-tool-name { font-size: var(--app-min-font); }
+.admin-tool-desc { font-size: var(--app-min-font); }
+.admin-tool-ctx { font-size: var(--app-min-font); }
+.cookbook-modeldir-tag { font-size: var(--app-min-font); }
+.cookbook-srv-default-label { font-size: var(--app-min-font); }
+.cookbook-modeldir-rm { font-size: var(--app-min-font); }
+.cookbook-modeldir-add { font-size: var(--app-min-font); }
+.lib-tab, .admin-tab { font-size: var(--app-min-font); }
+.gallery-tab { font-size: var(--app-min-font); }
+.gallery-tab-rename-input { font-size: var(--app-min-font); }
+.gallery-albums-empty { font-size: var(--app-min-font); }
+.gallery-album-name { font-size: var(--app-min-font); }
+.gallery-editor-landing p { font-size: var(--app-min-font); }
+.gallery-editor-landing-actions .gallery-select-btn { font-size: var(--app-min-font); }
+.gallery-editor-template-label { font-size: var(--app-min-font); }
+.gallery-editor-template-select { font-size: var(--app-min-font); }
+.gallery-editor-drafts-title { font-size: var(--app-min-font); }
+.gallery-editor-drafts-search { font-size: var(--app-min-font); }
+.gallery-editor-drafts-header .gallery-select-btn { font-size: var(--app-min-font); }
+.gallery-editor-draft-name { font-size: var(--app-min-font); }
+.gallery-editor-draft-delete { font-size: var(--app-min-font); }
+.email-field label { font-size: var(--app-min-font); }
+.email-field input { font-size: var(--app-min-font); }
+.email-draft-btn { font-size: var(--app-min-font); }
+.email-folder-select { font-size: var(--app-min-font); }
+.email-tag-spam { font-size: var(--app-min-font); }
+.email-spam-unflag { font-size: var(--app-min-font); }
+.doclib-card.email-card-expanded .memory-item-title { font-size: var(--app-min-font); }
+.email-card-reader { font-size: var(--app-min-font); }
+.email-reader-load-error-title { font-size: var(--app-min-font); }
+.email-reader-load-error-msg { font-size: var(--app-min-font); }
+.email-search-progress-row { font-size: var(--app-min-font); }
+.email-reader-body { font-size: var(--app-min-font); }
+.email-inline-image-title { font-size: var(--app-min-font); }
+.email-inline-image-btn { font-size: var(--app-min-font); }
+.email-inline-image-load-all { font-size: var(--app-min-font); }
+.email-inline-image-load-all button { font-size: var(--app-min-font); }
+.email-reader-body .gmail_chip a > span, .email-reader-body .gmail_drive_chip a > span { font-size: var(--app-min-font); }
+.email-summary-header { font-size: var(--app-min-font); }
+.email-summary-content { font-size: var(--app-min-font); }
+.email-translation-loading-text { font-size: var(--app-min-font); }
+.email-reader-atts-header { font-size: var(--app-min-font); }
+.email-attachments-download-all { font-size: var(--app-min-font); }
+.email-reader-atts-hidden-note { font-size: var(--app-min-font); }
+.email-thread-turn-body { font-size: var(--app-min-font); }
+.email-thread-turn-body .email-thread-turn .email-thread-turn-body { font-size: var(--app-min-font); }
+.email-fold-summary-name { font-size: var(--app-min-font); }
+.email-quote-fold .email-fold-summary { font-size: var(--app-min-font); }
+.email-sig-fold[open] > *:not(summary) { font-size: var(--app-min-font); }
+.schedule-send-presets .memory-toolbar-btn { font-size: var(--app-min-font); }
+.email-avatar { font-size: var(--app-min-font); }
+.email-sender { font-size: var(--app-min-font); }
+.email-filter-chip { font-size: var(--app-min-font); }
+.email-date { font-size: var(--app-min-font); }
+.email-subject { font-size: var(--app-min-font); }
+.email-tags-more { font-size: var(--app-min-font); }
+.email-tags-toggle-inline { font-size: var(--app-min-font) !important; }
+.email-tag { font-size: var(--app-min-font); }
+.email-tag-clickable { font-size: var(--app-min-font); }
+.email-loading { font-size: var(--app-min-font); }
+.email-load-more-btn { font-size: var(--app-min-font); }
+#email-compose-btn .list-item-plus-label { font-size: var(--app-min-font); }
+.doc-email-collapse-btn { font-size: var(--app-min-font); }
+.email-field .email-field-prefix { font-size: var(--app-min-font); }
+.email-send-btn { font-size: var(--app-min-font); }
+.email-discard-btn { font-size: var(--app-min-font); }
+.email-attachment-open { font-size: var(--app-min-font); }
+.email-compose-chip { font-size: var(--app-min-font); }
+.email-compose-chip .att-size { font-size: var(--app-min-font); }
+.email-odysseus-attach-local { font-size: var(--app-min-font); }
+.email-odysseus-attach-tabs button { font-size: var(--app-min-font); }
+.email-odysseus-attach-search { font-size: var(--app-min-font); }
+.email-odysseus-attach-title { font-size: var(--app-min-font); }
+.email-odysseus-attach-empty { font-size: var(--app-min-font); }
+.email-odysseus-attach-selected { font-size: var(--app-min-font); }
+.email-cc-toggle { font-size: var(--app-min-font); }
+.email-ai-reply-btn { font-size: var(--app-min-font); }
+.email-settings-title { font-size: var(--app-min-font); }
+.email-settings-close { font-size: var(--app-min-font); }
+.email-settings-loading, .email-settings-error { font-size: var(--app-min-font); }
+.email-settings-section-title { font-size: var(--app-min-font); }
+.email-settings-toggle, .email-settings-check { font-size: var(--app-min-font); }
+.email-settings-enabled-state { font-size: var(--app-min-font); }
+.email-settings-grid span, .email-settings-field > span { font-size: var(--app-min-font); }
+.email-settings-page input[type="date"], .email-settings-page input[type="datetime-local"], .email-settings-page select, .email-settings-page textarea { font-size: var(--app-min-font); }
+.email-settings-static-value { font-size: var(--app-min-font); }
+.email-style-extract-help { font-size: var(--app-min-font); }
+#email-lib-compose-btn { font-size: var(--app-min-font) !important; }
+.notes-search-bar .memory-search-input { font-size: var(--app-min-font); }
+.cal-quickadd-input { font-size: var(--app-min-font); }
+.cal-title { font-size: var(--app-min-font); }
+button.cal-nav { font-size: var(--app-min-font); }
+button.cal-today-btn { font-size: var(--app-min-font); }
+.cal-add-label { font-size: var(--app-min-font); }
+button.cal-add-btn.cal-add-btn-text.cal-add-btn-sm .cal-add-label { font-size: var(--app-min-font); }
+.cal-form-actions button.cal-btn { font-size: var(--app-min-font); }
+#email-lib-search { font-size: var(--app-min-font) !important; }
+#email-lib-search::placeholder { font-size: var(--app-min-font) !important; }
+.email-lib-pill { font-size: var(--app-min-font) !important; }
+.email-lib-pill-x { font-size: var(--app-min-font) !important; }
+.email-lib-filter-pill .email-lib-pill-x { font-size: var(--app-min-font) !important; }
+.email-loading-label { font-size: var(--app-min-font); }
+button.cal-view-btn { font-size: var(--app-min-font); }
+.cal-filter-item { font-size: var(--app-min-font); }
+.cal-filter-toggle { font-size: var(--app-min-font); }
+.cal-weekday { font-size: var(--app-min-font); }
+.cal-event-row-name { font-size: var(--app-min-font); }
+.cal-event-more { font-size: var(--app-min-font); }
+.cal-multiday { font-size: var(--app-min-font); }
+.cal-detail-header { font-size: var(--app-min-font); }
+.cal-empty { font-size: var(--app-min-font); }
+.cal-event-name { font-size: var(--app-min-font); }
+.cal-event-tag { font-size: var(--app-min-font); }
+.cal-event-loc { font-size: var(--app-min-font); }
+.cal-year-month-title { font-size: var(--app-min-font); }
+.cal-search-input { font-size: var(--app-min-font); }
+.cal-agenda-date { font-size: var(--app-min-font); }
+.cal-agenda-empty { font-size: var(--app-min-font); }
+.cal-empty-title { font-size: var(--app-min-font); }
+.cal-empty-msg { font-size: var(--app-min-font); }
+.cal-allday-label { font-size: var(--app-min-font); }
+.cal-form-title { font-size: var(--app-min-font); }
+.cal-form-today { font-size: var(--app-min-font); }
+.cal-input { font-size: var(--app-min-font); }
+button.cal-btn { font-size: var(--app-min-font); }
+.cal-nav { font-size: var(--app-min-font); }
+.cal-view-btn { font-size: var(--app-min-font); }
+.research-pane { font-size: var(--app-min-font); }
+.research-pane-body { font-size: var(--app-min-font); }
+.research-new-job h2 { font-size: var(--app-min-font); }
+.research-query { font-size: var(--app-min-font); }
+.research-setting-label { font-size: var(--app-min-font); }
+.research-setting select { font-size: var(--app-min-font); }
+.research-start-btn { font-size: var(--app-min-font); }
+.research-cat { font-size: var(--app-min-font); }
+.research-settings-toggle { font-size: var(--app-min-font); }
+.research-add-btn { font-size: var(--app-min-font); }
+.research-run-mode-popover { font-size: var(--app-min-font); }
+.research-run-mode-popover .rrm-title { font-size: var(--app-min-font); }
+.research-empty { font-size: var(--app-min-font); }
+.research-hero-label { font-size: var(--app-min-font); }
+.research-hero-query { font-size: var(--app-min-font); }
+.research-job-query { font-size: var(--app-min-font); }
+.research-job-model { font-size: var(--app-min-font); }
+.research-job-action { font-size: var(--app-min-font); }
+.research-job-phase { font-size: var(--app-min-font); }
+.research-section-divider { font-size: var(--app-min-font); }
+.research-section-title { font-size: var(--app-min-font); }
+.research-main-header { font-size: var(--app-min-font); }
+.research-job-error { font-size: var(--app-min-font); }
+.research-source-link { font-size: var(--app-min-font); }
+.research-source-more { font-size: var(--app-min-font); }
+.research-job-report-body { font-size: var(--app-min-font); }
+.research-job-report-body h1, .research-job-report-body h2, .research-job-report-body h3 { font-size: var(--app-min-font); }
+.research-job-report-body pre { font-size: var(--app-min-font); }
+.research-job-loading { font-size: var(--app-min-font); }
+.research-library-toggle { font-size: var(--app-min-font); }
+.research-library-item { font-size: var(--app-min-font); }
+.research-section-clear { font-size: var(--app-min-font); }
+.research-job-failnote { font-size: var(--app-min-font); }
+.settings-system-logs-search { font-size: var(--app-min-font); }
+.settings-system-logs-select { font-size: var(--app-min-font); }
+.settings-system-logs-autopoll-container { font-size: var(--app-min-font); }
