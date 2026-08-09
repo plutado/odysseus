@@ -94,6 +94,7 @@ Voice lives in **one place** — the composer toolbar. The **mic** is how you ta
 ### Interface
 
 - **Larger sidebar navigation.** Sidebar nav items and section headers are set to 14px for readability (they otherwise inherit a smaller root size).
+- **Notes: 16px minimum text.** The Notes pane and fullscreen editor shipped with sub-16px text (filter tabs 10px, search/"Select"/inline quick-add 11px, note title 13px, checklist rows 14px, card body 15px). A scoped fork rule sets **16px as the floor** for all readable Notes text (per-card `#hashtag` chips stay a compact 14px). Appended last in `static/style.css` so it wins same-specificity ties.
   - Files: `static/style.css`.
 
 ### Models & endpoints

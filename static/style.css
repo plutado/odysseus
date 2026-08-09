@@ -41155,3 +41155,32 @@ body.theme-frosted .modal {
    To restore the click-to-load privacy flow WITH per-image download buttons,
    set localStorage odysseusEmailImagesManual='1' AND remove this rule. */
 .email-inline-image-download-btn { display: none !important; }
+
+/* ── Fork: Notes interface — 16px minimum font size ─────────────────────────
+   The Notes pane and fullscreen editor shipped with sub-16px text that read as
+   too small: filter tabs 10px, search / "Select" / inline quick-add 11px, note
+   title 13px, checklist rows 14px, card body 15px. Establish 16px as the floor
+   for all readable text across the whole Notes UI. Scoped to the notes roots so
+   nothing else is affected; appended last so it wins same-specificity ties
+   (e.g. the fullscreen .note-cl-text 14px rule). */
+.notes-pane { font-size: 16px; }
+.notes-pane .note-card,
+.notes-pane .note-card-title,
+.notes-pane .note-cl-text,
+.notes-pane .note-cl-text-reader,
+.notes-pane .note-cl-quickadd-input,
+.notes-pane .notes-quick-input,
+.notes-pane .memory-search-input,
+.notes-pane #notes-search,
+.notes-pane .notes-select-trigger,
+.notes-pane .notes-label-chip,
+.note-fullscreen-overlay,
+.note-fullscreen-overlay .note-card-title,
+.note-fullscreen-overlay .note-cl-text,
+.note-fullscreen-overlay .note-cl-text-reader,
+.note-fullscreen-overlay .note-cl-quickadd-input,
+.note-fullscreen-overlay .notes-quick-input {
+  font-size: 16px;
+}
+/* Per-card #hashtag chips: readable but compact (secondary metadata). */
+.notes-pane .note-card-label-chip { font-size: 14px; }
