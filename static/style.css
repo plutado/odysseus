@@ -29,6 +29,10 @@
   --green: #50fa7b;
   --warn: #f0ad4e;
 
+  /* Fork: app-wide readable-text floor. Panels/components below reference this
+     so the minimum font size is tuned in one place. */
+  --app-min-font: 16px;
+
   /* Syntax highlighting */
   --hl-bg: #1e2228;
   --hl-fg: #9cdef2;
@@ -41156,14 +41160,33 @@ body.theme-frosted .modal {
    set localStorage odysseusEmailImagesManual='1' AND remove this rule. */
 .email-inline-image-download-btn { display: none !important; }
 
-/* ── Fork: Notes interface — 16px minimum font size ─────────────────────────
-   The Notes pane and fullscreen editor shipped with sub-16px text that read as
-   too small: filter tabs 10px, search / "Select" / inline quick-add 11px, note
-   title 13px, checklist rows 14px, card body 15px. Establish 16px as the floor
-   for all readable text across the whole Notes UI. Scoped to the notes roots so
-   nothing else is affected; appended last so it wins same-specificity ties
-   (e.g. the fullscreen .note-cl-text 14px rule). */
-.notes-pane { font-size: 16px; }
+/* ── Fork: app-wide readable-text floor (--app-min-font, default 16px) ───────
+   Several panels shipped with sub-16px text that read as too small. This block
+   establishes 16px as the minimum for readable text, tuned in one place via
+   --app-min-font (change that :root value to rescale everything below).
+
+   Two layers per panel:
+   1. Set the panel ROOT font-size to the variable. This only raises text that
+      *inherits* — fixed-px structural bits (grids, badges, icons) keep their
+      size — so it's a low-risk lift of the "floor".
+   2. Explicitly bump the specific fixed-px readable elements that would
+      otherwise stay small (they set their own font-size, so inheritance can't
+      reach them).
+   Appended last so it wins same-specificity ties (e.g. .tasks-modal-content
+   12px, the fullscreen .note-cl-text 14px). */
+
+/* Panel roots — lift the inherited baseline. */
+.notes-pane,
+.note-fullscreen-overlay,
+.tasks-modal-content,
+#calendar-modal,
+#email-lib-modal {
+  font-size: var(--app-min-font);
+}
+
+/* Notes — explicit bumps for the fixed-px readable elements
+   (filter tabs 10px, search / "Select" / inline quick-add 11px, title 13px,
+   checklist 14px, card 15px). */
 .notes-pane .note-card,
 .notes-pane .note-card-title,
 .notes-pane .note-cl-text,
@@ -41174,13 +41197,12 @@ body.theme-frosted .modal {
 .notes-pane #notes-search,
 .notes-pane .notes-select-trigger,
 .notes-pane .notes-label-chip,
-.note-fullscreen-overlay,
 .note-fullscreen-overlay .note-card-title,
 .note-fullscreen-overlay .note-cl-text,
 .note-fullscreen-overlay .note-cl-text-reader,
 .note-fullscreen-overlay .note-cl-quickadd-input,
 .note-fullscreen-overlay .notes-quick-input {
-  font-size: 16px;
+  font-size: var(--app-min-font);
 }
 /* Per-card #hashtag chips: readable but compact (secondary metadata). */
 .notes-pane .note-card-label-chip { font-size: 14px; }
