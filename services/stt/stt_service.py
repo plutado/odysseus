@@ -145,7 +145,11 @@ class STTService:
             data["prompt"] = prompt
 
         try:
-            r = httpx.post(url, headers=headers, files=files, data=data, timeout=60)
+            # 60s was too tight: a local Metal STT model under load (e.g. sharing
+            # the voice server with TTS) can exceed it, surfacing as a 504 and a
+            # failed dictation. Allow more headroom — the request is interactive
+            # but a slow transcription is still better than losing it.
+            r = httpx.post(url, headers=headers, files=files, data=data, timeout=180)
             r.raise_for_status()
             result = r.json()
             text = result.get("text", "")
