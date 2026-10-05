@@ -42434,3 +42434,9 @@ details.hwfit-serve-advanced > summary.hwfit-serve-advanced-summary { font-size:
 .workspace-note { font-size: var(--app-min-font-min); }
 #log-console-container { font-size: var(--app-min-font-min); }
 .log-line { font-size: var(--app-min-font-min); }
+
+/* ── Fork: 14px floor top-up for CSS added by upstream merge (4 selectors). ── */
+.settings-nav-search { font-size: var(--app-min-font-min); }
+.settings-search-result-label { font-size: var(--app-min-font-min); }
+.settings-search-result-group { font-size: var(--app-min-font-min); }
+.settings-search-empty { font-size: var(--app-min-font-min); }
