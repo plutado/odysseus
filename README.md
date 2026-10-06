@@ -35,7 +35,7 @@
 - **[App self-awareness](#chat).** The chat model now *knows what Odysseus is* and — in agent mode — actually **does** things (creates notes/events, manages memory, runs research…) instead of just describing them, backed by a live snapshot of your workspace. Requires local endpoints to have tool-calling enabled (⚠️).
 - **[Readable everywhere](#interface).** A two-tier font floor — **16px** primary / **14px** absolute minimum — across the whole app (panels, tool modals, nav, composer), tunable from one CSS variable.
 - **[Email](#email) & [Calendar](#calendar).** Inline images auto-load, numbers render correctly; new calendar events default to a CalDAV sync-out calendar.
-- **[Models & endpoints](#models--endpoints).** Local host-gateway endpoints are detected as *local* (so their models appear + tool-calling works).
+- **[Models & endpoints](#models--endpoints).** Local host-gateway endpoints are detected as *local* (so their models appear + tool-calling works) — plus a recipe for running an **"Ajax"-style uncensored local model**, applied to the 35B rather than the 9B so you keep full capability (and vision) at ~65 tok/s.
 
 ### Run this fork
 
@@ -113,6 +113,63 @@ Voice lives in **one place** — the composer toolbar. The **mic** is how you ta
 - **Local (host-gateway) endpoints are detected as local.** `host.docker.internal` and `gateway.docker.internal` — the Docker Desktop aliases a container uses to reach services on the *host* (the standard "Odysseus in Docker + native Ollama / models on the host" setup) — are now classified as **local** endpoints. Previously they were treated as remote `"api"` endpoints, which puts the model picker into pinning/allow-list mode, so locally-served models don't show up for selection unless explicitly pinned. With this fix, host-served local models appear automatically.
   - Files: `routes/model_routes.py` (`_LOCAL_HOSTS`); test in `tests/test_model_routes.py` (`TestClassifyEndpoint.test_docker_host_gateway_is_local`).
   - ⚠️ **Backend change** — this is baked into the image, so apply it with `docker compose up -d --build` (a rebuild), not just a page reload.
+
+#### Running an "Ajax"-style uncensored local model
+
+Odysseus's author announced **Ajax** — a fine-tune of **Qwen3.5-9B** with refusal behavior removed using the open-source [Heretic](https://github.com/p-e-w/heretic) abliteration tool, meant to run locally in Odysseus. **The Ajax weights were never published** (as of 2026-10-05 the announced link asked for training-data contributions rather than offering a download — re-check before assuming). The recipe is public, though, so you can reproduce the same thing from off-the-shelf parts.
+
+These are **runtime/setup instructions, not repo contents** — no model ships with this fork.
+
+**Recommended: apply the recipe to the 35B, not the 9B.** Abliterating the model you already use beats adopting a smaller one — you keep the capability and gain the behavior:
+
+```bash
+# 22 GB. Heretic-abliterated Qwen3.6-35B-A3B, with MTP preserved.
+ollama pull hf.co/llmfan46/Qwen3.6-35B-A3B-uncensored-heretic-Native-MTP-Preserved-GGUF:Q4_K_M
+
+# Short, readable name for the model picker
+ollama cp hf.co/llmfan46/Qwen3.6-35B-A3B-uncensored-heretic-Native-MTP-Preserved-GGUF:Q4_K_M ajax:35b
+```
+
+> **Pick an `MTP-Preserved` build.** Qwen3.6-A3B is a Mixture-of-Experts model whose speed depends on multi-token prediction. Most abliterated conversions strip MTP and throughput collapses. Preserving it measured **64.6 tok/s vs ~68 tok/s** for stock qwen3.6 — roughly a 5% cost. (The 9B equivalent, `hf.co/lukey03/Qwen3.5-9B-abliterated-GGUF:Q4_K_M`, runs at only ~48 tok/s and has **no vision**.)
+
+**Make it selectable in Odysseus.** Local models must be in the endpoint's `cached_models`, and `pinned_models` guarantees they surface in the picker:
+
+```bash
+docker compose exec -T odysseus python - <<'PY'
+import json
+from core.database import SessionLocal, ModelEndpoint
+db = SessionLocal()
+e = db.query(ModelEndpoint).filter(ModelEndpoint.base_url.like('%11434%')).first()
+cached = json.loads(e.cached_models or '[]'); pinned = json.loads(e.pinned_models or '[]')
+for m in ['ajax:35b']:
+    if m not in cached: cached.append(m)
+    if m not in pinned: pinned.append(m)
+e.cached_models = json.dumps(cached); e.pinned_models = json.dumps(pinned)
+e.supports_tools = True          # REQUIRED — see below
+db.commit(); print(cached, pinned)
+PY
+```
+
+⚠️ **`supports_tools = True` is mandatory for agent mode.** For local Ollama endpoints Odysseus keeps native tool-calling **opt-in**. Leave it unset and agent runs log `tools_sent=0` — the model receives **no tool schemas** and emits a *fake text* tool call that never executes, which reads as the model "describing tools instead of using them."
+
+**Then, in Settings → AI Defaults:** set **Default Chat Model** to `ajax:35b`. Because this build keeps the base model's **vision** capability, you can point **Vision** at it too (the 9B variant cannot — it's text-only). The Endpoint stays `host.docker.internal:11434`. Only *new* chat sessions pick up the change; existing sessions keep the model they were created with.
+
+**Verify it end to end** — native tool calling is the part most likely to be silently missing:
+
+```bash
+curl -s http://localhost:11434/v1/chat/completions -H 'Content-Type: application/json' -d '{
+  "model":"ajax:35b",
+  "messages":[{"role":"user","content":"Add a to-do: verify tools. Use the tool."}],
+  "tools":[{"type":"function","function":{"name":"manage_notes","description":"Create/manage notes and todos.",
+    "parameters":{"type":"object","properties":{"action":{"type":"string"},"content":{"type":"string"}},
+    "required":["action","content"]}}}],"stream":false}' | python3 -m json.tool
+```
+
+A populated `tool_calls` array means agent mode will work. Also check `ollama show ajax:35b` lists `tools` under *Capabilities*.
+
+**Caveats.** Abliterated models are **uncensored by design** — that is the entire point of the Heretic step, and it is a real behavior change from stock Qwen, so choose deliberately. Quality also drifts slightly from the base model: abliteration is a blunt edit to the weights, not a fine-tune.
+
+**Long agent runs:** raise **`agent_max_rounds`** in `data/settings.json` (default **20**, max **200**). At 20, long multi-step work stops mid-task and emits `rounds_exhausted`. Don't raise `agent_input_token_budget` (default `6000`) — that value is an *auto* sentinel that already scales to ~85% of the context window; setting it explicitly turns it into a hard cap and makes things worse.
 
 ### Developer notes (for extending this fork)
 
