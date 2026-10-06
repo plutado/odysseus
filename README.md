@@ -23,6 +23,25 @@
 
 ---
 
+> ### 🔱 Looking for this fork's customizations? They're on [`local-customizations`](https://github.com/plutado/odysseus/tree/local-customizations).
+>
+> **This `dev` branch is an unmodified mirror of upstream [odysseus-dev/odysseus](https://github.com/odysseus-dev/odysseus)** — kept in sync so the fork doesn't drift, and deliberately left clean so upstream merges stay conflict-free.
+>
+> All of the actual work lives on **[`local-customizations`](https://github.com/plutado/odysseus/tree/local-customizations)**, whose [README](https://github.com/plutado/odysseus/blob/local-customizations/README.md) documents every change. Highlights:
+>
+> - **Voice** — one-mic dictation with auto-stop, spoken replies with a real Kokoro voice picker, barge-in, answer-only speech (never the reasoning trace).
+> - **App self-awareness** — the chat model knows what Odysseus is and, in agent mode, *acts* (creates notes/events, manages memory) instead of just describing, with a live snapshot of the workspace.
+> - **Readability** — a two-tier font floor (16px primary / 14px minimum) across the whole app, driven by one CSS variable.
+> - **Local-model fixes** — host-gateway endpoints detected as local; native tool-calling enabled for local Ollama; plus a recipe for running an **"Ajax"-style uncensored local model**.
+> - **Email / Calendar** — inline images auto-load, correct number rendering, CalDAV sync-out defaults.
+>
+> Tuned for **Odysseus in Docker on macOS with the ML models running natively on the host** (Metal). Run it with:
+> ```bash
+> git clone -b local-customizations https://github.com/plutado/odysseus.git
+> ```
+
+---
+
 ## Quick Start
 
 > `dev` is the default branch and gets the newest changes first. Use [`main`](https://github.com/odysseus-dev/odysseus/tree/main) if you want the more curated branch.
