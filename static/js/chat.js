@@ -1981,6 +1981,10 @@ import { loadPanel } from './panels.js';
       const ragChk = el('rag-toggle');
       if (ragChk && !ragChk.checked) {
         fd.append('use_rag', 'false');
+      } else if (window.RagScope) {
+        // Fork: folder chosen in the RAG picker ('' = all indexed folders).
+        const ragScope = window.RagScope.getRagScope();
+        if (ragScope) fd.append('rag_scope', ragScope);
       }
       if (isIncognito) {
         fd.append('incognito', 'true');

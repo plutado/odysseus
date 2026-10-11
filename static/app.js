@@ -10,7 +10,7 @@ import modelsModule from './js/models.js?v=20260715startupcalm2';
 import ragModule from './js/rag.js';
 import presetsModule from './js/presets.js';
 import searchModule from './js/search.js';
-import chatModule from './js/chat.js?v=20260819approvalcontrol1';
+import chatModule from './js/chat.js?v=20261011rag1a';
 import compareModule from './js/compare/index.js?v=20260819approvalcontrol1';
 import documentModule from './js/document.js?v=20260815approvalsave1';
 import searchChatModule from './js/search-chat.js';
@@ -53,6 +53,7 @@ import { initKeyboardShortcuts } from './js/keyboard-shortcuts.js';
 import { getSettings } from './js/appConfig.js';
 import { initSidebarLayout, syncRailSide } from './js/sidebar-layout.js?v=20260715startupclean';
 import { initSectionCollapse, initSectionDrag } from './js/section-management.js';
+import { initRagScope } from './js/ragScope.js?v=20261011rag2';
 
 const API_BASE = window.location.origin;
 window.themeModule = themeModule;
@@ -2119,12 +2120,12 @@ function initializeEventListeners() {
     const overflow = el('overflow-rag-btn');
     const chk = el('rag-toggle');
     if (chk) chk.checked = active;
-    if (indicator) {
-      indicator.style.display = active ? '' : 'none';
-      indicator.classList.toggle('active', active);
-    }
     if (overflow) overflow.classList.toggle('active', active);
     const s = loadToggleState(); s.rag = active; saveToggleState(s);
+    // Fork: the indicator is the always-visible RAG picker (js/ragScope.js);
+    // it shows "RAG off" instead of disappearing.
+    if (window.RagScope) window.RagScope.render();
+    else if (indicator) indicator.classList.toggle('active', active);
     updatePlusDot();
   }
   window._syncRagIndicator = _syncRagIndicator;
@@ -2137,8 +2138,12 @@ function initializeEventListeners() {
   // Init RAG state on load
   {
     const st = loadToggleState();
-    const ragState = st.rag || false;
+    // Fork: RAG is on unless the user turned it off. The old code stored
+    // rag=false on every load, so flip existing browsers on once.
+    if (!st.rag_picker_v1) { st.rag = true; st.rag_picker_v1 = true; saveToggleState(st); }
+    const ragState = st.rag !== undefined ? !!st.rag : true;
     _syncRagIndicator(ragState);
+    initRagScope();
   }
 
   // ── Overflow "..." menu (Research) ──
@@ -2572,7 +2577,6 @@ function initializeEventListeners() {
 
   // ── Overflow RAG toggle ──
   const overflowRagBtn = el('overflow-rag-btn');
-  const ragIndicatorBtn = el('rag-indicator-btn');
   if (overflowRagBtn) {
     overflowRagBtn.addEventListener('click', () => {
       const chk = el('rag-toggle');
@@ -2580,11 +2584,9 @@ function initializeEventListeners() {
       _syncRagIndicator(isActive);
     });
   }
-  if (ragIndicatorBtn) {
-    ragIndicatorBtn.addEventListener('click', () => {
-      _syncRagIndicator(false);
-    });
-  }
+  // Fork: clicking the RAG indicator opens the folder picker (js/ragScope.js)
+  // instead of switching RAG off; "Off" is one of the picker's choices.
+
 
   // ── Overflow Research toggle ──
   const overflowResearchBtn = el('overflow-research-btn');

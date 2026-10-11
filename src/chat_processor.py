@@ -1,3 +1,4 @@
+import os
 # src/chat_processor.py
 import logging
 import math
@@ -328,6 +329,7 @@ class ChatProcessor:
         incognito: bool = False,
         use_skills: bool = True,
         use_app_context: bool = True,
+        rag_scope: Optional[str] = None,
     ) -> Tuple[List[Dict[str, str]], List[Dict[str, Any]], List[Dict[str, str]]]:
         """Build the context preface for LLM calls.
 
@@ -426,7 +428,13 @@ class ChatProcessor:
             try:
                 rag_manager = getattr(self.personal_docs_manager, 'rag_manager', None)
                 if rag_manager:
-                    results = rag_manager.search(message, k=5, owner=owner)
+                    # rag_scope (an absolute folder path from the chat-bar
+                    # picker) limits retrieval to one indexed folder.
+                    scope = rag_scope if (rag_scope and os.path.isabs(rag_scope)) else None
+                    if scope:
+                        results = rag_manager.search(message, k=5, owner=owner, scope=scope)
+                    else:
+                        results = rag_manager.search(message, k=5, owner=owner)
                     # Filter by similarity threshold
                     relevant = [r for r in results if r.get("similarity", 0) >= self.RAG_SIMILARITY_THRESHOLD]
                     if relevant:
@@ -439,7 +447,10 @@ class ChatProcessor:
                             }
                             for r in relevant
                         ]
-                        rag_content = "Relevant documents:\n\n" + "\n\n---\n\n".join(
+                        rag_content = (
+                            "Relevant documents from the user's own indexed folders "
+                            "(answer from these before searching the web when they cover the question):\n\n"
+                        ) + "\n\n---\n\n".join(
                             f"[{s['filename']}]\n{r['document']}" for s, r in zip(rag_sources, relevant)
                         )
                         if len(rag_content) > 10000:
