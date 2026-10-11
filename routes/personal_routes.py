@@ -11,6 +11,7 @@ from fastapi.concurrency import run_in_threadpool
 from src.request_models import DirectoryRequest
 from core.constants import BASE_DIR, PERSONAL_DIR, PERSONAL_UPLOADS_DIR
 from src.rag_singleton import get_rag_manager
+from src import linked_sources
 from src.auth_helpers import require_privilege, require_user
 from core.middleware import require_admin
 from src.upload_handler import secure_filename
@@ -207,12 +208,19 @@ def setup_personal_routes(personal_docs_manager, rag_manager, rag_available):
             indexed.append({
                 "path": root,
                 "name": os.path.basename(root) or root,
+                "linked": bool(linked_sources.entry_for(root)),
                 "files": sum(1 for f in personal_docs_manager.index
                              if os.path.realpath(f.get("path", "") or "").startswith(root + os.sep)),
                 "subfolders": [{"path": p, "name": os.path.relpath(p, root)} for p in sorted(subs)],
             })
         indexed_roots = {i["path"] for i in indexed}
         available = []
+        # Linked sources not indexed yet (their folder may not exist until the first sync).
+        for name, path in linked_sources.linked_folders().items():
+            real = os.path.realpath(path)
+            if real not in indexed_roots:
+                available.append({"path": real, "name": name, "linked": True})
+                indexed_roots.add(real)
         if os.path.isdir(base):
             for name in sorted(os.listdir(base)):
                 full = os.path.join(base, name)
@@ -220,6 +228,56 @@ def setup_personal_routes(personal_docs_manager, rag_manager, rag_available):
                     continue
                 available.append({"path": full, "name": name})
         return {"base": base, "indexed": indexed, "available": available}
+
+    @router.post("/sync_refresh")
+    async def sync_refresh_directory(
+        directory_request: DirectoryRequest,
+        owner: str = Depends(require_user), _admin: None = Depends(require_admin),
+    ):
+        """Fork: one-click refresh for the RAG picker. For a linked source,
+        copy its files from the mounted source first; then drop the folder's
+        passages and index it again, so edited or deleted files leave nothing
+        stale behind."""
+        raw = directory_request.directory
+        base_abs = os.path.realpath(PERSONAL_DIR)
+        candidate = raw if os.path.isabs(raw) else os.path.join(base_abs, raw)
+        linked = linked_sources.entry_for(candidate)
+        if linked:
+            try:
+                synced = await run_in_threadpool(linked_sources.sync, candidate)
+            except ValueError as e:
+                raise HTTPException(400, str(e))
+        else:
+            synced = None
+        directory = _resolve_allowed_personal_dir(raw)
+        if not os.path.isdir(directory):
+            raise HTTPException(404, f"Directory not found: {directory}")
+        rag = _rag()
+        if not rag:
+            raise HTTPException(503, "RAG system is not available")
+
+        def _reindex():
+            if hasattr(personal_docs_manager, "remove_directory"):
+                personal_docs_manager.remove_directory(directory)
+            try:
+                rag.remove_directory(directory)
+            except Exception as e:
+                logger.warning(f"RAG removal failed for directory {directory}: {e}")
+            result = rag.index_personal_documents(directory, owner=owner)
+            if result.get("success"):
+                personal_docs_manager.add_directory(directory, index=False)
+            return result
+
+        async with _index_job_lock:
+            result = await run_in_threadpool(_reindex)
+        if not result.get("success"):
+            raise HTTPException(500, result.get("message", "Failed to index directory"))
+        return {
+            "success": True,
+            "directory": directory,
+            "indexed_count": result.get("indexed_count", 0),
+            "synced": synced,
+        }
 
     @router.post("/reload")
     async def api_personal_reload(owner: str = Depends(require_user), _admin: None = Depends(require_admin)):

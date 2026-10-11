@@ -53,7 +53,7 @@ import { initKeyboardShortcuts } from './js/keyboard-shortcuts.js';
 import { getSettings } from './js/appConfig.js';
 import { initSidebarLayout, syncRailSide } from './js/sidebar-layout.js?v=20260715startupclean';
 import { initSectionCollapse, initSectionDrag } from './js/section-management.js';
-import { initRagScope } from './js/ragScope.js?v=20261011rag2';
+import { initRagScope } from './js/ragScope.js?v=20261011rag3';
 
 const API_BASE = window.location.origin;
 window.themeModule = themeModule;
