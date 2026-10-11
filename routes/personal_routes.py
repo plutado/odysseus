@@ -188,6 +188,39 @@ def setup_personal_routes(personal_docs_manager, rag_manager, rag_available):
         directories = personal_docs_manager.get_indexed_directories() if hasattr(personal_docs_manager, "get_indexed_directories") else []
         return {"files": files, "directories": directories}
     
+    @router.get("/folders")
+    def api_personal_folders(owner: str = Depends(require_user), _admin: None = Depends(require_admin)):
+        """Folders the RAG picker can offer: each indexed directory with its
+        subfolders, plus top-level folders in personal docs not yet indexed."""
+        base = os.path.realpath(PERSONAL_DIR)
+        indexed = []
+        for d in (personal_docs_manager.get_indexed_directories()
+                  if hasattr(personal_docs_manager, "get_indexed_directories") else []):
+            root = os.path.realpath(d)
+            subs = set()
+            for f in personal_docs_manager.index:
+                parent = os.path.dirname(os.path.realpath(f.get("path", "") or ""))
+                if parent.startswith(root + os.sep):
+                    rel = os.path.relpath(parent, root).split(os.sep)
+                    for depth in range(1, min(len(rel), 2) + 1):
+                        subs.add(os.path.join(root, *rel[:depth]))
+            indexed.append({
+                "path": root,
+                "name": os.path.basename(root) or root,
+                "files": sum(1 for f in personal_docs_manager.index
+                             if os.path.realpath(f.get("path", "") or "").startswith(root + os.sep)),
+                "subfolders": [{"path": p, "name": os.path.relpath(p, root)} for p in sorted(subs)],
+            })
+        indexed_roots = {i["path"] for i in indexed}
+        available = []
+        if os.path.isdir(base):
+            for name in sorted(os.listdir(base)):
+                full = os.path.join(base, name)
+                if name.startswith(".") or not os.path.isdir(full) or full in indexed_roots:
+                    continue
+                available.append({"path": full, "name": name})
+        return {"base": base, "indexed": indexed, "available": available}
+
     @router.post("/reload")
     async def api_personal_reload(owner: str = Depends(require_user), _admin: None = Depends(require_admin)):
         # refresh_index() re-extracts text across every tracked directory —

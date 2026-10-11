@@ -995,6 +995,8 @@ def setup_chat_routes(
         allow_bash = form_data.get("allow_bash") or (body or {}).get("allow_bash")
         allow_web_search = form_data.get("allow_web_search") or (body or {}).get("allow_web_search")
         use_rag = form_data.get("use_rag")
+        # Folder the RAG picker in the chat bar limits retrieval to ('' = all indexed folders).
+        rag_scope = str(form_data.get("rag_scope") or (body or {}).get("rag_scope") or "").strip() or None
         search_context = form_data.get("search_context")  # pre-fetched web search results (compare mode)
         compare_mode = str(form_data.get("compare_mode", "")).lower() == "true"
         incognito = str(form_data.get("incognito", "")).lower() == "true"
@@ -1362,6 +1364,7 @@ def setup_chat_routes(
             att_ids=att_ids,
             use_web=use_web,
             use_rag=use_rag,
+            rag_scope=rag_scope,
             time_filter=time_filter,
             incognito=incognito,
             no_memory=no_memory,

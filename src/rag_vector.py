@@ -40,6 +40,19 @@ DEFAULT_FILE_EXTENSIONS: Set[str] = {
 # keyword indexers apply the same hidden/junk policy and cannot drift (#5559).
 
 VECTOR_WEIGHT = 0.7
+
+def _in_scope(meta: Dict[str, Any], scope: Optional[str]) -> bool:
+    """True when a chunk's source file sits inside the folder ``scope``.
+
+    ``scope`` is an absolute folder path (the RAG picker in the chat bar sends
+    one). Matching is on whole path segments, so ``/docs`` never matches
+    ``/docs-old``. No scope means every chunk is in scope.
+    """
+    if not scope:
+        return True
+    root = os.path.normpath(scope)
+    src = os.path.normpath(str(meta.get("source") or meta.get("directory") or ""))
+    return src == root or src.startswith(root.rstrip(os.sep) + os.sep)
 KEYWORD_WEIGHT = 0.3
 
 COLLECTION_NAME = "odysseus_rag"
@@ -345,7 +358,9 @@ class VectorRAG:
     # Search — hybrid: vector similarity + keyword overlap
     # ------------------------------------------------------------------
 
-    def search(self, query: str, k: int = 5, owner: Optional[str] = None) -> List[Dict[str, Any]]:
+    def search(self, query: str, k: int = 5, owner: Optional[str] = None,
+               scope: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Hybrid search. ``scope`` limits results to one indexed folder."""
         if not self.healthy:
             return []
         if not query or not isinstance(query, str):
@@ -361,9 +376,12 @@ class VectorRAG:
             for lane, results in query_lanes(
                 self._lanes,
                 query,
+                # A folder scope is applied after the query (Chroma metadata
+                # filters have no path-prefix match), so pull a wider candidate
+                # pool to leave enough in-scope chunks after filtering.
                 n_results=lambda lane: min(
-                    (k * 6 if owner else k * 3),
-                    max(k, 20),
+                    (200 if scope else (k * 6 if owner else k * 3)),
+                    max(k, 200 if scope else 20),
                     lane.count(),
                 ),
                 where=where_filter,
@@ -375,6 +393,8 @@ class VectorRAG:
                     distance = results["distances"][0][idx]
                     doc_text = results["documents"][0][idx]
                     meta = results["metadatas"][0][idx]
+                    if not _in_scope(meta, scope):
+                        continue
 
                     vector_sim = 1.0 - distance
                     doc_words = set(doc_text.lower().split())
@@ -400,9 +420,10 @@ class VectorRAG:
 
         except Exception as e:
             logger.error(f"search failed: {e}")
-            return self._keyword_search_fallback(query, k, owner=owner)
+            return self._keyword_search_fallback(query, k, owner=owner, scope=scope)
 
-    def _keyword_search_fallback(self, query: str, k: int = 5, owner: Optional[str] = None) -> List[Dict[str, Any]]:
+    def _keyword_search_fallback(self, query: str, k: int = 5, owner: Optional[str] = None,
+                                 scope: Optional[str] = None) -> List[Dict[str, Any]]:
         try:
             if not self._active_collections():
                 return []
@@ -418,6 +439,8 @@ class VectorRAG:
                 for i, doc in enumerate(all_docs["documents"]):
                     meta = all_docs["metadatas"][i]
                     if owner and meta.get("owner") != owner:
+                        continue
+                    if not _in_scope(meta, scope):
                         continue
                     doc_lower = doc.lower()
                     score = sum(1 for w in query_words if w in doc_lower)
