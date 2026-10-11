@@ -1,5 +1,8 @@
 // Fork: RAG picker in the chat bar.
 //
+// Linked folders (src/linked_sources.py) show "Sync & refresh": one click
+// copies the latest files from the mounted source and re-indexes.
+//
 // The RAG indicator next to the message box is always visible and names what
 // chat and agent replies search: "All docs", one indexed folder (or one of its
 // subfolders), or "Off". Clicking it opens a menu to switch scope, refresh a
@@ -80,7 +83,7 @@ function esc(s) {
 function item(label, { value = null, checked = false, indent = 0, action = '', hint = '' } = {}) {
   const v = value === null ? '' : ` data-scope="${esc(value)}"`;
   const a = action ? ` data-action="${esc(action)}"` : '';
-  const tip = action === 'refresh' ? ' title="Re-read this folder after its files change"' : '';
+  const tip = action === 'refresh' ? ' title="Pick up changed files: copies from the linked source if there is one, then re-indexes"' : '';
   return `<button type="button" class="rag-scope-item${checked ? ' checked' : ''}" style="padding-left:${12 + indent * 16}px"${v}${a}${tip}>`
     + `<span class="rag-scope-check">${checked ? '✓' : ''}</span><span class="rag-scope-name">${esc(label)}</span>`
     + (hint ? `<span class="rag-scope-hint">${esc(hint)}</span>` : '') + '</button>';
@@ -100,10 +103,14 @@ function menuHtml() {
   if (!folders.indexed.length) h += '<div class="rag-scope-empty">No folders indexed yet.</div>';
   h += '<div class="rag-scope-sep"></div>';
   const target = refreshTarget(s);
-  if (target) h += item(`Refresh ${target.name}`, { action: 'refresh' });
+  if (target) h += item(`${target.linked ? 'Sync & refresh' : 'Refresh'} ${target.name}`, { action: 'refresh' });
   if (folders.available.length) {
     h += '<div class="rag-scope-title">Not indexed yet</div>';
-    for (const f of folders.available) h += item(`Index ${f.name}`, { action: `add:${f.path}` });
+    for (const f of folders.available) {
+      h += f.linked
+        ? item(`Sync & index ${f.name}`, { action: `link:${f.path}` })
+        : item(`Index ${f.name}`, { action: `add:${f.path}` });
+    }
   }
   h += `<form class="rag-scope-add"><input type="text" placeholder="Folder name, e.g. notes" aria-label="Folder to index">`
     + '<button type="submit">Index</button></form>';
@@ -151,16 +158,32 @@ async function indexFolder(path, btn) {
 }
 
 async function refreshFolder(folder, btn) {
-  busy = `Refreshing ${folder.name}…`;
+  // One server call: a linked folder first copies its latest files from the
+  // linked source (src/linked_sources.py), then the folder is re-indexed from
+  // scratch so edited or deleted files leave no stale passages.
+  busy = folder.linked ? `Syncing ${folder.name} from its source…` : `Refreshing ${folder.name}…`;
   draw(btn);
-  try {
-    // Remove then re-add, so passages from edited or deleted files go away.
-    await fetch(`${API}/api/personal/remove_directory?directory=${encodeURIComponent(folder.path)}`,
-      { method: 'DELETE', credentials: 'same-origin' });
-  } catch (_) { /* re-add below either way */ }
   const keep = state();
-  await indexFolder(folder.path, btn);
+  try {
+    const res = await fetch(`${API}/api/personal/sync_refresh`, {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ directory: folder.path }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      const s = data.synced;
+      busy = (s ? `Copied ${s.copied} changed file${s.copied === 1 ? '' : 's'}. ` : '')
+        + `Indexed ${data.indexed_count || 0} passages.`
+        + (s && s.missing && s.missing.length ? ` Missing at source: ${s.missing.join(', ')}` : '');
+    } else {
+      busy = `Could not refresh: ${data.detail || res.status}`;
+    }
+  } catch (e) {
+    busy = `Could not refresh: ${e.message}`;
+  }
   save(keep.on, keep.scope);
+  await loadFolders();
   render();
   if (menuEl) draw(btn);
 }
@@ -194,6 +217,7 @@ async function open(btn) {
     if (action === 'off') { save(false, state().scope); render(); close(); return; }
     if (action === 'refresh') { const t = refreshTarget(state()); if (t) refreshFolder(t, btn); return; }
     if (action.startsWith('add:')) { indexFolder(action.slice(4), btn); return; }
+    if (action.startsWith('link:')) { const p = action.slice(5); refreshFolder({ path: p, name: p.split('/').pop(), linked: true }, btn); return; }
     if (b.dataset.scope !== undefined) { save(true, b.dataset.scope); render(); close(); }
   });
   menuEl.addEventListener('submit', (e) => {
